@@ -1,4 +1,4 @@
-# Claudity
+# 🧊 Claudity
 
 An AI thinking partner that pushes back, for Claude Code.
 
