@@ -2,7 +2,9 @@
 
 Claudity is derived from [Clarity Agent](https://github.com/microsoft/clarity-agent)
 by Microsoft Corporation, used under the MIT License. Claudity is an independent
-port and is **not affiliated with, sponsored by, or endorsed by Microsoft**.
+port and is **not affiliated with, sponsored by, or endorsed by Microsoft or
+Anthropic**. "Claude" and "Claude Code" are products of Anthropic; Claudity is
+a third-party plugin for Claude Code.
 
 Vendored content is pinned to upstream commit
 `6b32c4349502d56d1c2e863c4778b322f8ff9466` — see [UPSTREAM.md](UPSTREAM.md) for
