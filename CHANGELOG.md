@@ -11,7 +11,7 @@ the upstream pin it tracks).
 
 - Three-tier test harness: structural pytest suite, `claude plugin validate`
   in CI, headless e2e smoke scenarios with a hard cost budget (see TESTING.md)
-- Upstream watcher: biweekly GitHub Action that compares the pinned upstream
+- Upstream watcher: nightly GitHub Action that compares the pinned upstream
   commit against `microsoft/clarity-agent` main, filtered to the vendored
   path set, and opens an `upstream-sync` issue when a re-sync is needed
 - `upstream.json`: machine-readable pin + vendored-path watch list

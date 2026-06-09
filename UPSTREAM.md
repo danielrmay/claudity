@@ -49,11 +49,11 @@ installers, dev-tools, and the VS Code extension. Claudity replaces these
 with Claude Code natives. CI's harness-residue lints
 (`tests/test_plugin_structure.py`) guard against accidental bleed-through.
 
-**Cadence:** the `upstream-watch` workflow runs biweekly (1st and 15th) and
-on demand via `workflow_dispatch`. When upstream changes touch the watch set
-it opens or refreshes a single issue labeled `upstream-sync`. Re-syncs are
+**Cadence:** the `upstream-watch` workflow runs nightly (02:43 UTC) and on
+demand via `workflow_dispatch`. When upstream changes touch the watch set it
+opens or refreshes a single issue labeled `upstream-sync`. Re-syncs are
 batched per issue, not per upstream commit; upstream releases every 2-3
-weeks, so most issues will cover one upstream release.
+weeks, so most issues will accumulate toward one upstream release.
 
 **Accepting changes:** for each changed file in the issue, follow the
 re-sync procedure below. Adaptations must trace to a PORTING.md rule; a

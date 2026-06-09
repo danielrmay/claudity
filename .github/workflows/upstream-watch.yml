@@ -2,7 +2,7 @@ name: upstream-watch
 
 on:
   schedule:
-    - cron: "0 9 1,15 * *"   # biweekly; upstream releases every ~2-3 weeks
+    - cron: "43 2 * * *"   # nightly at 02:43 UTC; off-peak odd minute to dodge GitHub's top-of-hour congestion
   workflow_dispatch:
 
 permissions:
