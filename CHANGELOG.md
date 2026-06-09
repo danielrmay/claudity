@@ -5,6 +5,15 @@ All notable changes to Claudity are documented here. The format follows
 [semver](https://semver.org/), independent of upstream (each release records
 the upstream pin it tracks).
 
+## [Unreleased]
+
+### Removed
+
+- The experimental README warning, following the isolated real-session
+  validation on Fable 5 (docs/example-session.md) on top of the automated
+  harness. AI-port provenance and the verification scope remain disclosed in
+  the README intro and TESTING.md.
+
 ## [0.2.0] - 2026-06-09
 
 Tracks microsoft/clarity-agent@6b32c43 (upstream v0.1.2).

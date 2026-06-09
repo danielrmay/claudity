@@ -24,16 +24,6 @@ An AI thinking partner that pushes back, for Claude Code.
 turns in, the project has a different shape, a privacy requirement nobody had
 thought about, and all of it written to versionable markdown in the repo.
 
-> [!WARNING]
-> **Experimental and not yet human-validated.** This port from
-> [microsoft/clarity-agent](https://github.com/microsoft/clarity-agent) was
-> performed by AI agents (Claude Code). While the vendored staleness engine
-> passes upstream's test suite, the plugin as a whole (the router skill,
-> process guides, thinker subagents, and commands) has not been validated by
-> a human or exercised on real projects. Expect rough edges; review before
-> relying on it. See [TESTING.md](TESTING.md) for what is and isn't covered
-> by automated tests.
-
 Claudity helps you figure out whether you're building the right thing in the
 first place, by asking the questions an experienced architect, product manager,
 or safety engineer would ask. The answers are written down as plain markdown
@@ -46,8 +36,11 @@ Claudity is a Claude Code plugin port of Microsoft's
 Python/desktop harness replaced by Claude Code natives: process guides become a
 skill, specialist "thinkers" become subagents, the async mailbox becomes
 parallel subagent calls, and staleness tracking is a small vendored script.
-Claudity is an independent project. It is not affiliated with or endorsed by
-Microsoft or Anthropic. See [NOTICE.md](NOTICE.md).
+The port was performed by AI agents (Claude Code) and is covered by a tiered
+automated test harness plus real-session runs; see [TESTING.md](TESTING.md)
+for exactly what is and isn't verified. Claudity is an independent project.
+It is not affiliated with or endorsed by Microsoft or Anthropic. See
+[NOTICE.md](NOTICE.md).
 
 ## Prerequisites
 

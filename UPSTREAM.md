@@ -66,8 +66,8 @@ Tier 1 and Tier 2 tests, and record the new pin in the CHANGELOG entry.
 
 ## Versioning and releases
 
-Claudity uses independent semver (0.x while the not-human-validated warning
-stands in the README):
+Claudity uses independent semver (0.x until the full process surface has been
+exercised on real projects end to end):
 
 - **PATCH** — local fixes, docs, test changes; no guide-behavior change
 - **MINOR** — upstream re-syncs that change guide content/behavior, new
