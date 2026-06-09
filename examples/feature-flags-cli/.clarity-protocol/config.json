@@ -1,0 +1,55 @@
+{
+  "claudity": {
+    "version": "0.1.0"
+  },
+  "thinkers": {
+    "disabled": [],
+    "custom": []
+  },
+  "processes": {
+    "custom": []
+  },
+  "documentState": {
+    "goal/problem.md": {
+      "contentHash": "680ee2f109ed6b155193f8220bb10becbb2446becdeb285d6d2cdacdd0326d06",
+      "dependencyHashes": {}
+    },
+    "goal/stakeholders.md": {
+      "contentHash": "2e03466cef3cad96de01dfdc22a66804b12f7fb962fbeb52da953e6952db59fa",
+      "dependencyHashes": {
+        "goal/problem.md": "680ee2f109ed6b155193f8220bb10becbb2446becdeb285d6d2cdacdd0326d06"
+      }
+    },
+    "goal/requirements.md": {
+      "contentHash": "1460eb150aa193d049940f94adc5799e4548279d3bdb9b7167d2a4239c5eb9a3",
+      "dependencyHashes": {
+        "goal/problem.md": "680ee2f109ed6b155193f8220bb10becbb2446becdeb285d6d2cdacdd0326d06",
+        "goal/stakeholders.md": "2e03466cef3cad96de01dfdc22a66804b12f7fb962fbeb52da953e6952db59fa"
+      }
+    },
+    "goal/open-questions.md": {
+      "contentHash": "19668c6e7db0e7e71a1eb4c294668e35f44823f474968638048f6acb7d7646c4",
+      "dependencyHashes": {
+        "goal/problem.md": "680ee2f109ed6b155193f8220bb10becbb2446becdeb285d6d2cdacdd0326d06"
+      }
+    },
+    "solution/solution.md": {
+      "contentHash": "3ba8d553c1ccfde3c6b11ecbd6386bebb2aa9d7d49c54fef514afa8b51535c43",
+      "dependencyHashes": {
+        "goal/problem.md": "680ee2f109ed6b155193f8220bb10becbb2446becdeb285d6d2cdacdd0326d06",
+        "goal/requirements.md": "1460eb150aa193d049940f94adc5799e4548279d3bdb9b7167d2a4239c5eb9a3",
+        "goal/open-questions.md": "19668c6e7db0e7e71a1eb4c294668e35f44823f474968638048f6acb7d7646c4"
+      }
+    }
+  },
+  "decisionState": {
+    "decision-01-go-vs-rust": {
+      "status": "decided",
+      "relatedDocs": {
+        "solution/solution.md": "3ba8d553c1ccfde3c6b11ecbd6386bebb2aa9d7d49c54fef514afa8b51535c43"
+      },
+      "decidedDate": "2026-06-09",
+      "reviewBy": null
+    }
+  }
+}
