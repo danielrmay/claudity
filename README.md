@@ -19,7 +19,7 @@ Claudity is not affiliated with or endorsed by Microsoft — see
 ## Install
 
 ```
-/plugin marketplace add danielmay/claudity
+/plugin marketplace add danielrmay/claudity
 /plugin install claudity@claudity
 ```
 
