@@ -5,14 +5,14 @@ An AI thinking partner that pushes back, for Claude Code.
 > 🧑‍💻 &nbsp;**You:** I want to build a CLI tool that snapshots and restores
 > local dev databases.
 >
-> 🤔 &nbsp;**Claudity:** I can already imagine the tool — but I want to make
+> 🧊 &nbsp;**Claudity:** I can already imagine the tool — but I want to make
 > sure I understand the *pain* first, because "a snapshot CLI" is an
 > artifact. [...] The magic-wand test: if snapshot/restore already existed
 > and worked perfectly, what would you actually do differently day-to-day?
 >
 > 💬 &nbsp;*a few answers later...*
 >
-> 🤔 &nbsp;**Claudity:** **You're not building a snapshot tool — you're
+> 🧊 &nbsp;**Claudity:** **You're not building a snapshot tool — you're
 > building a state-sharing tool.** Every detail you just gave — push/pull,
 > names like `bug-1234`, credentials, "who has which version" — describes a
 > *distribution* problem. [...] What's actually *in* these dev databases?
