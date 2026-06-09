@@ -7,7 +7,7 @@ Anthropic**. "Claude" and "Claude Code" are products of Anthropic; Claudity is
 a third-party plugin for Claude Code.
 
 Vendored content is pinned to upstream commit
-`6b32c4349502d56d1c2e863c4778b322f8ff9466` — see [UPSTREAM.md](UPSTREAM.md) for
+`6b32c4349502d56d1c2e863c4778b322f8ff9466`. See [UPSTREAM.md](UPSTREAM.md) for
 the file-by-file vendoring map and [PORTING.md](PORTING.md) for the substitution
 rules applied to vendored files.
 
