@@ -51,13 +51,23 @@ make a consequential choice.
 
 ```text
 .clarity-protocol/
-├── summary.md                # what this project is, for a general audience
-├── notes.md                  # shared memory: principles, cross-phase observations
-├── goal/                     # problem, stakeholders, requirements, open questions
-├── solution/                 # solution, architecture (with threat model), summary
-├── failures/                 # failure modes, chains, management plans
-├── decisions/                # decision log with criteria and rationale
-└── config.json               # dependency graph + content hashes (staleness tracking)
+├── summary.md                  # what this project is, for a general audience
+├── notes.md                    # shared memory: principles, cross-phase observations
+├── observations.md             # patterns and coverage notes from analysis
+├── goal/
+│   ├── problem.md              # what you're trying to achieve and why
+│   ├── stakeholders.md         # who cares about the outcome
+│   ├── requirements.md         # criteria any solution must satisfy
+│   ├── open-questions.md       # unknowns that could change the approach
+│   └── resolved-questions.md   # answered questions, with findings
+├── solution/
+│   ├── solution.md             # what you plan to build
+│   ├── architecture.md         # how you plan to build it (with threat model)
+│   └── solution-summary.md     # concise overview for stakeholders
+├── failures/                   # failure modes, chains, management plans
+│   └── pool/                   # raw brainstormed failures awaiting analysis
+├── decisions/                  # decision log with criteria and rationale
+└── config.json                 # dependency graph + content hashes (staleness tracking)
 ```
 
 Documents form a dependency graph (problem → stakeholders → requirements →
@@ -73,6 +83,7 @@ e2e/run.sh                      # headless behavioral smoke (~$0.25 on Haiku)
 ```
 
 See [TESTING.md](TESTING.md) for the full test-tier breakdown and cost model.
+The bundled scripts are stdlib-only Python, tested on 3.10+.
 
 Vendored content is pinned to an upstream commit. See [UPSTREAM.md](UPSTREAM.md)
 for the vendoring map and re-sync procedure, and [PORTING.md](PORTING.md) for

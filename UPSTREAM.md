@@ -1,7 +1,13 @@
 # Upstream tracking
 
 Vendored from [microsoft/clarity-agent](https://github.com/microsoft/clarity-agent)
-at commit `6b32c4349502d56d1c2e863c4778b322f8ff9466` (main, fetched 2026-06-09).
+at commit `6b32c4349502d56d1c2e863c4778b322f8ff9466` (main, fetched 2026-06-09;
+upstream release v0.1.2).
+
+**[`upstream.json`](upstream.json) is the machine-readable source of truth**
+for the pin and the vendored-path watch list. CI enforces that every vendored
+file's header matches its pin and that this file and NOTICE.md carry it. The
+table below is commentary on the same mapping.
 
 ## Vendoring map
 
@@ -29,6 +35,51 @@ at commit `6b32c4349502d56d1c2e863c4778b322f8ff9466` (main, fetched 2026-06-09).
 | `tests/conftest.py` | `tests/conftest.py` | fixtures only, keyring/Settings dropped |
 | `LICENSE` | `NOTICE.md` (quoted) | verbatim |
 
+## Sync policy
+
+**In scope** (the `upstream.json` watch set): process guides, thinkers, the
+security catalog, the protocol scripts (`packet_status.py`, `initialize.py`),
+the agent snippet, the packet-status tests, and the license. New upstream
+files appearing under `processes/`, `thinkers/`, or `catalogs/` are surfaced
+by the watcher as adoption candidates; once adopted they join the watch set.
+
+**Out of scope, never ported:** the agent harness — web UI, Tauri desktop
+app, LLM backends, MCP server, evals framework, transcript system,
+installers, dev-tools, and the VS Code extension. Claudity replaces these
+with Claude Code natives. CI's harness-residue lints
+(`tests/test_plugin_structure.py`) guard against accidental bleed-through.
+
+**Cadence:** the `upstream-watch` workflow runs biweekly (1st and 15th) and
+on demand via `workflow_dispatch`. When upstream changes touch the watch set
+it opens or refreshes a single issue labeled `upstream-sync`. Re-syncs are
+batched per issue, not per upstream commit; upstream releases every 2-3
+weeks, so most issues will cover one upstream release.
+
+**Accepting changes:** for each changed file in the issue, follow the
+re-sync procedure below. Adaptations must trace to a PORTING.md rule; a
+change that needs a new kind of substitution gets a new numbered rule first.
+After re-applying, bump the pin in `upstream.json` and the vendored file
+headers (CI fails until they agree), update NOTICE.md and this file, run
+Tier 1 and Tier 2 tests, and record the new pin in the CHANGELOG entry.
+
+## Versioning and releases
+
+Claudity uses independent semver (0.x while the not-human-validated warning
+stands in the README):
+
+- **PATCH** — local fixes, docs, test changes; no guide-behavior change
+- **MINOR** — upstream re-syncs that change guide content/behavior, new
+  thinkers or commands, new features
+- **MAJOR** — breaking changes to the protocol directory format or the
+  command surface
+
+Release steps: bump `version` in `.claude-plugin/plugin.json` and
+`.claude-plugin/marketplace.json` (a test enforces they agree; packets record
+the version via `protocol_init.py`), move the Unreleased CHANGELOG section to
+the new version with the upstream pin it tracks, then run
+`claude plugin tag` (creates a validated `claudity--vX.Y.Z` git tag) and push
+the tag.
+
 ## Re-sync procedure
 
 1. Pick the new upstream commit `NEW_SHA`; fetch each upstream file in the map:
@@ -43,5 +94,6 @@ at commit `6b32c4349502d56d1c2e863c4778b322f8ff9466` (main, fetched 2026-06-09).
    `reference/clarity-agent.upstream.md` and fold routing changes into the
    skill by hand; then update the reference copy.
 5. Run `.venv/bin/pytest tests/ -q`, run the M1 staleness round-trip
-   (see README), update the pinned SHA here and in NOTICE.md and the vendored
-   file headers.
+   (see README), update the pinned SHA in `upstream.json`, here, in
+   NOTICE.md, and in the vendored file headers (the pin-consistency tests
+   fail until all agree).

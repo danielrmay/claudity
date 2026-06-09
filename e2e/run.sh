@@ -17,8 +17,20 @@ source "$HERE/lib.sh"
 
 FILTER="${1:-}"
 MAX_COST="${CLAUDITY_MAX_COST_USD:-1.50}"
-declare -a NAMES RESULTS COSTS
+declare -a NAMES RESULTS COSTS PROJECTS
 overall=0
+
+# Scratch dirs are removed when the suite passes; kept (with paths printed)
+# on failure or when CLAUDITY_E2E_KEEP=1, for debugging.
+cleanup() {
+  if [[ "$overall" == "0" && "${CLAUDITY_E2E_KEEP:-0}" != "1" ]]; then
+    rm -rf "$ART_DIR" "${PROJECTS[@]:-}" 2>/dev/null
+  else
+    echo "kept artifacts: $ART_DIR"
+    printf 'kept project: %s\n' ${PROJECTS[@]+"${PROJECTS[@]}"}
+  fi
+}
+trap cleanup EXIT
 
 echo "Claudity e2e — model: $MODEL, artifacts: $ART_DIR"
 echo
@@ -38,6 +50,7 @@ for scenario in "$HERE"/scenarios/*/; do
 
   echo "── $name (fixture: $FIXTURE, max turns: $MAX_TURNS)"
   proj="$(new_project "$FIXTURE")"
+  PROJECTS+=("$proj")
   out="$ART_DIR/$name.json"
   run_claude "$proj" "$scenario/prompt.md" "$MAX_TURNS" "$out"
 
@@ -58,7 +71,7 @@ echo
 echo "scenario                 result   cost_usd"
 echo "------------------------ ------   --------"
 total=0
-for i in "${!NAMES[@]}"; do
+for i in ${NAMES[@]+"${!NAMES[@]}"}; do
   printf "%-24s %-6s   %s\n" "${NAMES[$i]}" "${RESULTS[$i]}" "${COSTS[$i]}"
   total=$(python3 -c "print(round($total + ${COSTS[$i]}, 4))")
 done

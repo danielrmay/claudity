@@ -1,0 +1,61 @@
+name: upstream-watch
+
+on:
+  schedule:
+    - cron: "0 9 1,15 * *"   # biweekly; upstream releases every ~2-3 weeks
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check upstream for vendored-path changes
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          report="$(scripts/upstream_check.sh)"
+          status=$?
+          set -e
+          echo "$report"
+          {
+            echo "report<<REPORT_EOF"
+            echo "$report"
+            echo "REPORT_EOF"
+          } >> "$GITHUB_OUTPUT"
+          if [ "$status" = "10" ]; then
+            echo "action_needed=true" >> "$GITHUB_OUTPUT"
+          elif [ "$status" = "0" ]; then
+            echo "action_needed=false" >> "$GITHUB_OUTPUT"
+          else
+            exit "$status"
+          fi
+
+      - name: Open or update the upstream-sync issue
+        if: steps.check.outputs.action_needed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create upstream-sync --repo "$GITHUB_REPOSITORY" \
+            --description "Upstream clarity-agent changes pending re-sync" \
+            --color FBCA04 2>/dev/null || true
+          existing="$(gh issue list --repo "$GITHUB_REPOSITORY" \
+            --label upstream-sync --state open --json number --jq '.[0].number')"
+          body="${{ steps.check.outputs.report }}"
+          if [ -n "$existing" ]; then
+            gh issue edit "$existing" --repo "$GITHUB_REPOSITORY" --body "$body"
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" \
+              --body "Refreshed by the upstream-watch workflow on $(date -u +%Y-%m-%d)."
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" \
+              --title "Upstream clarity-agent changes pending re-sync" \
+              --label upstream-sync \
+              --body "$body"
+          fi

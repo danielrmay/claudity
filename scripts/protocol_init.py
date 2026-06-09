@@ -52,9 +52,18 @@ def _resolve_protocol_dir(project_dir: Path) -> Path:
 # Default config
 # ---------------------------------------------------------------------------
 
+def _claudity_version() -> str:
+    """Read the plugin version (single-sourced from plugin.json)."""
+    manifest = Path(__file__).resolve().parent.parent / ".claude-plugin" / "plugin.json"
+    try:
+        return str(json.loads(manifest.read_text())["version"])
+    except (OSError, ValueError, KeyError):
+        return "unknown"
+
+
 DEFAULT_CONFIG: dict[str, object] = {
     "claudity": {
-        "version": "0.1.0",
+        "version": _claudity_version(),
     },
     "thinkers": {
         "disabled": [],

@@ -209,6 +209,74 @@ class TestProtocolScaffolding:
         assert "<!-- claudity-end -->" in snippet
         assert snippet.count("{{PROTOCOL_DIR_NAME}}") >= 2
 
+    def test_snippet_is_portable(self) -> None:
+        """The snippet is copied into user projects' CLAUDE.md, where
+        ${CLAUDE_PLUGIN_ROOT} is not defined — it must route through the
+        plugin's commands/skill instead of invoking script paths."""
+        snippet = (REPO / "skills" / "claudity" / "reference" / "snippet.md").read_text()
+        assert "CLAUDE_PLUGIN_ROOT" not in snippet
+
+    def test_init_version_matches_plugin(self, tmp_path: Path) -> None:
+        """Packets record which Claudity version scaffolded them."""
+        (tmp_path / ".git").mkdir()
+        pd = init_protocol(tmp_path)
+        cfg = json.loads((pd / "config.json").read_text())
+        plugin = json.loads((REPO / ".claude-plugin" / "plugin.json").read_text())
+        assert cfg["claudity"]["version"] == plugin["version"]
+
+
+# -----------------------------------------------------------------------
+# Upstream pin consistency (upstream.json is the source of truth)
+# -----------------------------------------------------------------------
+
+class TestUpstreamPin:
+    # Verbatim vendored files that cannot carry a header comment.
+    HEADER_EXEMPT = {
+        "catalogs/security-catalog.csv",
+        "skills/claudity/reference/clarity-agent.upstream.md",
+        "NOTICE.md",  # quotes the upstream license; carries the full pin instead
+    }
+
+    def upstream_config(self) -> dict:
+        return json.loads((REPO / "upstream.json").read_text())
+
+    def test_watch_locals_exist(self) -> None:
+        cfg = self.upstream_config()
+        missing = [w["local"] for w in cfg["watch"] if not (REPO / w["local"]).exists()]
+        assert not missing, f"watch entries without local files: {missing}"
+
+    def test_vendored_headers_match_pin(self) -> None:
+        cfg = self.upstream_config()
+        short = cfg["pin"][:7]
+        stale: list[str] = []
+        for entry in cfg["watch"]:
+            local = entry["local"]
+            if local in self.HEADER_EXEMPT:
+                continue
+            if f"clarity-agent@{short}" not in (REPO / local).read_text():
+                stale.append(local)
+        assert not stale, f"vendored files whose header pin != upstream.json pin: {stale}"
+
+    def test_full_pin_in_docs(self) -> None:
+        pin = self.upstream_config()["pin"]
+        for doc in ("NOTICE.md", "UPSTREAM.md"):
+            assert pin in (REPO / doc).read_text(), f"{doc} missing the full pin {pin}"
+
+    def test_vendored_files_all_watched(self) -> None:
+        """Every file carrying a vendor header appears in the watch set."""
+        cfg = self.upstream_config()
+        watched = {w["local"] for w in cfg["watch"]}
+        # SKILL.md and routing.md are rewrites of the watched upstream router.
+        rewrites = {"skills/claudity/SKILL.md", "skills/claudity/reference/routing.md"}
+        unwatched = [
+            str(p.relative_to(REPO))
+            for p in repo_markdown_files()
+            if "clarity-agent@" in p.read_text()
+            and str(p.relative_to(REPO)) not in watched | rewrites | self.HEADER_EXEMPT
+            and not str(p.relative_to(REPO)).startswith(("PORTING", "UPSTREAM", "README", "TESTING", "CHANGELOG"))
+        ]
+        assert not unwatched, f"files with vendor headers not in upstream.json watch set: {unwatched}"
+
 
 # -----------------------------------------------------------------------
 # Tier 0 via CLI (skipped when claude isn't installed)
