@@ -1,6 +1,6 @@
 ---
 name: claudity
-description: An AI thinking partner that pushes back. Use when the user wants to think through what they're building and why — explore or clarify a problem, requirements, or stakeholders; weigh a solution or architecture; brainstorm risks and failure modes; or work through a consequential decision. Also use proactively at inflection points: before choices that would be expensive to reverse (new services, auth/trust models, data schemas, external integrations, significant API contracts) — if getting it wrong means a multi-day rework rather than a 5-minute fix, engage. Works for software and non-software projects alike.
+description: "An AI thinking partner that pushes back. Use when the user wants to think through what they're building and why — explore or clarify a problem, requirements, or stakeholders; weigh a solution or architecture; brainstorm risks and failure modes; or work through a consequential decision. Also use proactively at inflection points: before choices that would be expensive to reverse (new services, auth/trust models, data schemas, external integrations, significant API contracts) — if getting it wrong means a multi-day rework rather than a 5-minute fix, engage. Works for software and non-software projects alike."
 ---
 
 <!-- Rewritten for Claudity from microsoft/clarity-agent@6b32c43 processes/clarity-agent.md — the verbatim original is in reference/clarity-agent.upstream.md; routing detail is in reference/routing.md -->

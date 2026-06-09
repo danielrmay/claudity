@@ -57,6 +57,12 @@ def parse_frontmatter(path: Path) -> dict[str, str]:
     return fm
 
 
+def frontmatter_block(path: Path) -> str:
+    lines = path.read_text().splitlines()
+    end = lines[1:].index("---") + 1
+    return "\n".join(lines[1:end])
+
+
 def repo_markdown_files() -> list[Path]:
     skip_parts = {".venv", ".git", "node_modules"}
     return [
@@ -116,6 +122,22 @@ class TestFrontmatter:
         for f in files:
             fm = parse_frontmatter(f)
             assert fm["description"], f"{f.name}: missing description"
+
+    def test_frontmatter_is_strict_yaml(self) -> None:
+        """Strict parsers silently drop ALL fields on invalid YAML (e.g. an
+        unquoted description containing ': '). Caught in the wild by
+        `claude plugin tag`; guarded here for every frontmatter file."""
+        yaml = pytest.importorskip("yaml")
+        files = [SKILL_MD] + sorted(AGENTS_DIR.glob("*.md")) + sorted(COMMANDS_DIR.glob("*.md"))
+        bad: list[str] = []
+        for f in files:
+            try:
+                parsed = yaml.safe_load(frontmatter_block(f))
+                if not isinstance(parsed, dict):
+                    bad.append(f"{f.relative_to(REPO)}: parsed to {type(parsed).__name__}")
+            except yaml.YAMLError as e:
+                bad.append(f"{f.relative_to(REPO)}: {str(e).splitlines()[0]}")
+        assert not bad, f"invalid YAML frontmatter: {bad}"
 
 
 # -----------------------------------------------------------------------
