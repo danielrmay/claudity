@@ -9,7 +9,8 @@ An AI thinking partner that pushes back — for Claude Code.
 > passes upstream's test suite, the plugin as a whole — the router skill,
 > process guides, thinker subagents, and commands — has not been validated by
 > a human or exercised on real projects. Expect rough edges; review before
-> relying on it.
+> relying on it. See [TESTING.md](TESTING.md) for what is and isn't covered
+> by automated tests.
 
 Claudity helps you figure out whether you're building the right thing in the
 first place, by asking the questions an experienced architect, product manager,
@@ -65,8 +66,11 @@ knows what downstream needs revisiting.
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install pytest
-.venv/bin/pytest tests/ -q
+.venv/bin/pytest tests/ -q      # free, deterministic
+e2e/run.sh                      # headless behavioral smoke (~$0.25 on Haiku)
 ```
+
+See [TESTING.md](TESTING.md) for the full test-tier breakdown and cost model.
 
 Vendored content is pinned to an upstream commit — see [UPSTREAM.md](UPSTREAM.md)
 for the vendoring map and re-sync procedure, and [PORTING.md](PORTING.md) for

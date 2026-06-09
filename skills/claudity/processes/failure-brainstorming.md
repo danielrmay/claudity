@@ -12,7 +12,9 @@ Brainstorming can happen over time. Multiple runs can contribute, humans can add
 
 ## Recording Findings
 
-Raw failures live in the **brainstorming pool**: `.clarity-protocol/failures/pool/`, one markdown file per failure. Create the directory if it doesn't exist. Write each failure **as you identify it** — don't batch them up. File name: `<source>--<slug>.md` (e.g. `broad--silent-sync-data-loss.md`, `security-thinker--token-replay.md`, `human--regulator-history.md`). Format:
+Raw failures live in the **brainstorming pool**: `.clarity-protocol/failures/pool/`, one markdown file per failure. Create the directory if it doesn't exist. Write each failure **as you identify it** — don't batch them up. File name: `<source>--<slug>.md` (e.g. `broad--silent-sync-data-loss.md`, `security-thinker--token-replay.md`, `human--regulator-history.md`).
+
+**Never write brainstormed failures directly into `failures/` itself.** Numbered `failure-NN-*.md` files there are *analyzed* failure modes — they are created only later, by the failure-analysis process, from this pool. **Never write into `failures/pool/archive/` either** — archived items have already been consumed by failure-analysis and won't be looked at again. New failures always go directly in `failures/pool/`, at the top level. Format:
 
 ```markdown
 # <Short title of what goes wrong>
@@ -48,7 +50,7 @@ To launch thinkers (Step 4):
    - the analysis mode: **quick** or **deep**
    - the absolute path to `<plugin-root>/skills/claudity/processes/failure-reasoning-guidelines.md`
    - for `security-catalog-thinker` only: the absolute path to `<plugin-root>/catalogs/security-catalog.csv`
-3. Each thinker returns structured `## Failures` / `## Suggestions` / `## Specialist recommendations` blocks. Persist every returned failure as a pool file (format above, Source = the thinker's name), apply suggestions to `notes.md`, and consider any specialist recommendations for the next round.
+3. Each thinker returns structured `## Failures` / `## Suggestions` / `## Specialist recommendations` blocks. Persist every returned failure as its own file in `.clarity-protocol/failures/pool/` named `<thinker-name>--<slug>.md` (format above, Source = the thinker's name) — not in `failures/` itself, and not indexed in `failures.md`. Apply suggestions to `notes.md`, and consider any specialist recommendations for the next round.
 
 Check prerequisites before launching: a thinker whose required documents are empty or missing will produce generic output — skip it and tell the user why.
 

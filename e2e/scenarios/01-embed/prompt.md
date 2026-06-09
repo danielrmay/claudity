@@ -1,0 +1,1 @@
+Run the /claudity:embed command for this project. This is a non-interactive test run: do not ask the user any questions, and do not start a conversation about the project afterwards — embed, confirm what was created in one sentence, and stop.

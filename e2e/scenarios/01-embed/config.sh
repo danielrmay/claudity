@@ -1,0 +1,2 @@
+FIXTURE="empty"
+MAX_TURNS=15
