@@ -2,6 +2,15 @@
 
 An AI thinking partner that pushes back — for Claude Code.
 
+> [!WARNING]
+> **Experimental — not yet human-validated.** This port from
+> [microsoft/clarity-agent](https://github.com/microsoft/clarity-agent) was
+> performed by AI agents (Claude Code). While the vendored staleness engine
+> passes upstream's test suite, the plugin as a whole — the router skill,
+> process guides, thinker subagents, and commands — has not been validated by
+> a human or exercised on real projects. Expect rough edges; review before
+> relying on it.
+
 Claudity helps you figure out whether you're building the right thing in the
 first place, by asking the questions an experienced architect, product manager,
 or safety engineer would ask. The answers are written down as plain markdown in
