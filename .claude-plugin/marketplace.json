@@ -1,0 +1,17 @@
+{
+  "name": "claudity",
+  "owner": {
+    "name": "Daniel May",
+    "email": "daniel@danielmay.co.uk"
+  },
+  "description": "Claudity — an AI thinking partner that pushes back, for Claude Code.",
+  "plugins": [
+    {
+      "name": "claudity",
+      "source": "./",
+      "description": "Structured problem clarification, decision guidance, and failure analysis, recorded as plain markdown in your repo. Derived from Microsoft's Clarity Agent (MIT).",
+      "version": "0.1.0",
+      "author": { "name": "Daniel May" }
+    }
+  ]
+}
