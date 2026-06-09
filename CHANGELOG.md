@@ -5,9 +5,17 @@ All notable changes to Claudity are documented here. The format follows
 [semver](https://semver.org/), independent of upstream (each release records
 the upstream pin it tracks).
 
-## [Unreleased]
+## [0.2.0] - 2026-06-09
+
+Tracks microsoft/clarity-agent@6b32c43 (upstream v0.1.2).
 
 ### Added
+
+- New-user onboarding: README quickstart, prerequisites, cost and privacy
+  notes, uninstall instructions, and a real example session transcript
+  (docs/example-session.md, recorded on Fable 5)
+- Contributor docs: CONTRIBUTING.md (upstream-first policy, adding-a-thinker
+  recipe), code of conduct, issue and PR templates
 
 - Three-tier test harness: structural pytest suite, `claude plugin validate`
   in CI, headless e2e smoke scenarios with a hard cost budget (see TESTING.md)

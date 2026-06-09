@@ -1,5 +1,7 @@
 # Porting rules
 
+*For contributors and maintainers. Users of the plugin don't need anything here.*
+
 Claudity vendors Clarity Agent's process guides and thinkers near-verbatim,
 changing only how they touch the outside world: Clarity's Python harness, MCP
 tools, and async mailboxes become Claude Code natives (Bash invocations of the

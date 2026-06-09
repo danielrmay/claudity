@@ -1,5 +1,7 @@
 # Upstream tracking
 
+*For contributors and maintainers. Users of the plugin don't need anything here.*
+
 Vendored from [microsoft/clarity-agent](https://github.com/microsoft/clarity-agent)
 at commit `6b32c4349502d56d1c2e863c4778b322f8ff9466` (main, fetched 2026-06-09;
 upstream release v0.1.2).

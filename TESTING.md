@@ -1,5 +1,7 @@
 # Testing
 
+*For contributors and maintainers. Users of the plugin don't need anything here.*
+
 The harness is tiered so inference is paid for only where behavior is
 model-driven. Tiers 0 and 1 are free and run in CI on every push; Tier 2 is a
 small headless smoke suite with a hard cost budget, run locally on demand.

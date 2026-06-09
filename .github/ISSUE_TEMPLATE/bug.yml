@@ -1,0 +1,35 @@
+name: Bug report
+description: Something didn't work the way the docs say it should
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you do, and what went wrong?
+      placeholder: I ran /claudity:embed and ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: model
+    attributes:
+      label: Model
+      description: Which model was the session using? (Behavior differs by model; see TESTING.md)
+      placeholder: e.g. opus, sonnet, haiku
+  - type: textarea
+    id: packet-state
+    attributes:
+      label: Protocol state (if relevant)
+      description: Output of `/claudity:status` or `python3 <plugin>/scripts/protocol_status.py .` in the affected project.
+      render: text
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      placeholder: claudity 0.2.0, Claude Code X.Y, python 3.12, macOS 15

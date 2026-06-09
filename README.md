@@ -14,9 +14,24 @@ An AI thinking partner that pushes back, for Claude Code.
 
 Claudity helps you figure out whether you're building the right thing in the
 first place, by asking the questions an experienced architect, product manager,
-or safety engineer would ask. The answers are written down as plain markdown in
-a `.clarity-protocol/` directory in your repo: committed, reviewed in PRs, and
-diffed like any other source file.
+or safety engineer would ask. From a real session
+([full transcript](docs/example-session.md)):
+
+> **You:** I want to build a CLI tool that snapshots and restores local dev
+> databases. [...] A Makefile around pg_dump doesn't solve the sharing part —
+> credentials, where dumps live, who has which version — that coordination is
+> the actual pain.
+>
+> **Claudity:** Here's the thing your answer surfaced, and I want to say it
+> explicitly rather than quietly absorb it: **you're not building a snapshot
+> tool — you're building a state-sharing tool.** [...] That matters because
+> the hard parts of those two products are completely different: a local
+> snapshot tool lives or dies on dump/restore mechanics; a sharing tool lives
+> or dies on the shared store, auth, naming, and trust.
+
+The answers are written down as plain markdown in a `.clarity-protocol/`
+directory in your repo: committed, reviewed in PRs, and diffed like any other
+source file. Nothing lives only in a chat transcript.
 
 Claudity is a Claude Code plugin port of Microsoft's
 [Clarity Agent](https://github.com/microsoft/clarity-agent) (MIT), with the
@@ -26,12 +41,35 @@ parallel subagent calls, and staleness tracking is a small vendored script.
 Claudity is an independent project. It is not affiliated with or endorsed by
 Microsoft or Anthropic. See [NOTICE.md](NOTICE.md).
 
+## Prerequisites
+
+- Claude Code with plugin support (a recent version)
+- `python3` 3.10+ on PATH (the bundled scripts are stdlib-only)
+- `git` (the protocol directory is designed to be committed)
+- Tested on macOS and Linux; Windows is untested
+
 ## Install
 
 ```
 /plugin marketplace add danielrmay/claudity
 /plugin install claudity@claudity
 ```
+
+## Quickstart
+
+1. In your project, run `/claudity:embed`. This scaffolds `.clarity-protocol/`
+   with template documents and adds a managed block to your `CLAUDE.md`.
+2. Just describe what you're building (or run `/claudity:start`). Claudity
+   asks questions and writes what it learns into the protocol documents as
+   you talk; ending a session mid-thought loses nothing.
+3. Next session, run `/claudity:status` (or just keep talking): it reads the
+   document state and picks up where you left off.
+
+The common path is problem clarification → solution → failure analysis →
+architecture; everything else (discovery, decisions, messaging) is invoked on
+demand. See the [example session](docs/example-session.md) for what the first
+conversation looks like, and [examples/feature-flags-cli](examples/feature-flags-cli)
+for a complete protocol directory.
 
 ## Use
 
@@ -46,6 +84,25 @@ Microsoft or Anthropic. See [NOTICE.md](NOTICE.md).
 Or just talk: with the plugin enabled, Claude engages the `claudity` skill when
 you want to explore what to build, clarify requirements, brainstorm risks, or
 make a consequential choice.
+
+## Cost and privacy
+
+The plugin adds about 800 tokens of always-on context per session. Process
+guides load on demand when a phase starts (roughly 2k to 8k tokens each), and
+the failure-brainstorming thinkers run as subagents, which is the main token
+spend; quick mode keeps them bounded. As a reference point, the
+[example session](docs/example-session.md) cost about $2.80 on the largest
+model over three substantial turns.
+
+Everything Claudity produces is plain files in your repo. Your conversation
+goes through Claude Code to Anthropic exactly like any other session; the
+plugin makes no other network calls and collects no telemetry.
+
+## Uninstall
+
+- Plugin: `/plugin uninstall claudity`
+- Per project: delete `.clarity-protocol/` and remove the block between
+  `<!-- claudity-begin -->` and `<!-- claudity-end -->` in `CLAUDE.md`
 
 ## What comes out
 
@@ -82,8 +139,9 @@ python3 -m venv .venv && .venv/bin/pip install pytest
 e2e/run.sh                      # headless behavioral smoke (~$0.25 on Haiku)
 ```
 
-See [TESTING.md](TESTING.md) for the full test-tier breakdown and cost model.
-The bundled scripts are stdlib-only Python, tested on 3.10+.
+See [TESTING.md](TESTING.md) for the full test-tier breakdown and cost model,
+and [CONTRIBUTING.md](CONTRIBUTING.md) for how to contribute (including adding
+a new thinker).
 
 Vendored content is pinned to an upstream commit. See [UPSTREAM.md](UPSTREAM.md)
 for the vendoring map and re-sync procedure, and [PORTING.md](PORTING.md) for

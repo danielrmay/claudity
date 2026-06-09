@@ -1,0 +1,22 @@
+name: Idea or improvement
+description: A new thinker, process improvement, or feature suggestion
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: The idea
+      description: What would you like Claudity to do, and what problem does it solve for you?
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Where does it belong?
+      description: Improvements to vendored guide content should usually go upstream to microsoft/clarity-agent first (see CONTRIBUTING.md).
+      options:
+        - Claudity-specific (orchestration, commands, scripts, new thinker)
+        - Probably upstream guide content (I'll consider filing there)
+        - Not sure
+    validations:
+      required: true
