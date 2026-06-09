@@ -2,6 +2,30 @@
 
 An AI thinking partner that pushes back, for Claude Code.
 
+> **You:** I want to build a CLI tool that snapshots and restores local dev
+> databases.
+>
+> **Claudity:** I can already imagine the tool — but I want to make sure I
+> understand the *pain* first, because "a snapshot CLI" is an artifact. [...]
+> What happens today when your dev DB gets into a bad state? [...] And the
+> magic-wand test: if snapshot/restore already existed and worked perfectly,
+> what would you actually do differently day-to-day?
+>
+> *(a few answers later)*
+>
+> **Claudity:** **You're not building a snapshot tool — you're building a
+> state-sharing tool.** Every detail you just gave — push/pull, names like
+> `bug-1234`, credentials, "who has which version" — describes a
+> *distribution* problem. [...] What's actually *in* these dev databases?
+> [...] if dev DBs ever contain production-derived rows or real customer
+> data — which is exactly the kind of data that makes a bug "only
+> reproducible with her exact DB" — then `snap push` is quietly building an
+> unaudited archive of customer data, copied to a bucket and six laptops.
+
+Real session, abridged — [full transcript](docs/example-session.md). Three
+turns in, the project has a different shape, a privacy requirement nobody had
+thought about, and all of it written to versionable markdown in the repo.
+
 > [!WARNING]
 > **Experimental and not yet human-validated.** This port from
 > [microsoft/clarity-agent](https://github.com/microsoft/clarity-agent) was
@@ -14,24 +38,10 @@ An AI thinking partner that pushes back, for Claude Code.
 
 Claudity helps you figure out whether you're building the right thing in the
 first place, by asking the questions an experienced architect, product manager,
-or safety engineer would ask. From a real session
-([full transcript](docs/example-session.md)):
-
-> **You:** I want to build a CLI tool that snapshots and restores local dev
-> databases. [...] A Makefile around pg_dump doesn't solve the sharing part —
-> credentials, where dumps live, who has which version — that coordination is
-> the actual pain.
->
-> **Claudity:** Here's the thing your answer surfaced, and I want to say it
-> explicitly rather than quietly absorb it: **you're not building a snapshot
-> tool — you're building a state-sharing tool.** [...] That matters because
-> the hard parts of those two products are completely different: a local
-> snapshot tool lives or dies on dump/restore mechanics; a sharing tool lives
-> or dies on the shared store, auth, naming, and trust.
-
-The answers are written down as plain markdown in a `.clarity-protocol/`
-directory in your repo: committed, reviewed in PRs, and diffed like any other
-source file. Nothing lives only in a chat transcript.
+or safety engineer would ask. The answers are written down as plain markdown
+in a `.clarity-protocol/` directory in your repo: committed, reviewed in PRs,
+and diffed like any other source file. Nothing lives only in a chat
+transcript.
 
 Claudity is a Claude Code plugin port of Microsoft's
 [Clarity Agent](https://github.com/microsoft/clarity-agent) (MIT), with the
