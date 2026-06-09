@@ -2,27 +2,25 @@
 
 An AI thinking partner that pushes back, for Claude Code.
 
-> **You:** I want to build a CLI tool that snapshots and restores local dev
-> databases.
+> 🧑‍💻 &nbsp;**You:** I want to build a CLI tool that snapshots and restores
+> local dev databases.
 >
-> **Claudity:** I can already imagine the tool — but I want to make sure I
-> understand the *pain* first, because "a snapshot CLI" is an artifact. [...]
-> What happens today when your dev DB gets into a bad state? [...] And the
-> magic-wand test: if snapshot/restore already existed and worked perfectly,
-> what would you actually do differently day-to-day?
+> 🤔 &nbsp;**Claudity:** I can already imagine the tool — but I want to make
+> sure I understand the *pain* first, because "a snapshot CLI" is an
+> artifact. [...] The magic-wand test: if snapshot/restore already existed
+> and worked perfectly, what would you actually do differently day-to-day?
 >
-> *(a few answers later)*
+> 💬 &nbsp;*a few answers later...*
 >
-> **Claudity:** **You're not building a snapshot tool — you're building a
-> state-sharing tool.** Every detail you just gave — push/pull, names like
-> `bug-1234`, credentials, "who has which version" — describes a
+> 🤔 &nbsp;**Claudity:** **You're not building a snapshot tool — you're
+> building a state-sharing tool.** Every detail you just gave — push/pull,
+> names like `bug-1234`, credentials, "who has which version" — describes a
 > *distribution* problem. [...] What's actually *in* these dev databases?
-> [...] if dev DBs ever contain production-derived rows or real customer
-> data — which is exactly the kind of data that makes a bug "only
-> reproducible with her exact DB" — then `snap push` is quietly building an
-> unaudited archive of customer data, copied to a bucket and six laptops.
+> [...] if dev DBs ever contain production-derived rows [...] then
+> `snap push` is quietly building an unaudited archive of customer data,
+> copied to a bucket and six laptops.
 
-Real session, abridged — [full transcript](docs/example-session.md). Three
+✨ Real session, abridged — [full transcript](docs/example-session.md). Three
 turns in, the project has a different shape, a privacy requirement nobody had
 thought about, and all of it written to versionable markdown in the repo.
 
