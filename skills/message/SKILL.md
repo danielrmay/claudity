@@ -5,7 +5,7 @@ disable-model-invocation: true
 ---
 <!-- Vendored from microsoft/clarity-agent@6b32c43 processes/message-clarification.md — modified per PORTING.md rules R10, R16 (packaged as a skill), R17 -->
 
-This works best when the problem and solution documents have real content — if they're still templates, say so and route through Claudity's `start` skill first. If the user named an audience or messaging focus when invoking this skill, honor it; follow the guide below from the beginning.
+This works best when the problem and solution documents have real content — if they're still templates, say so and route through Claudity's `start` skill first. If the user named an audience or messaging focus when invoking this skill, honor it; follow the guide below from the beginning. The summary is not recorded until it was either written with the `write_protocol_document` tool or recorded via the `--record` script step near the end of this guide — a native file write alone does not record state.
 # Message Clarification
 
 Build the narrative that explains what this project is and why anyone should care — starting with the general story and optionally developing audience-specific versions.
