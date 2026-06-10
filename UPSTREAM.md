@@ -24,30 +24,40 @@ table below is commentary on the same mapping.
 | `processes/discovery-research.md` | `skills/start/processes/discovery-research.md` | near-verbatim + PORTING rules |
 | `processes/discovery-prototype.md` | `skills/start/processes/discovery-prototype.md` | near-verbatim + PORTING rules |
 | `processes/message-clarification.md` | `skills/message/SKILL.md` | near-verbatim + PORTING rules (packaged as a skill, R16) |
-| `processes/failure-brainstorming.md` | `skills/risks/SKILL.md` | adapted (mailbox → parallel subagents, R9/R14; packaged as a skill, R16) |
+| `processes/failure-brainstorming.md` | `skills/risks/SKILL.md` | adapted (thinker dispatch → parallel subagents, R9; CLI blocks → MCP tools, R17; packaged as a skill, R16) |
 | `processes/failure-analysis.md` | `skills/start/processes/failure-analysis.md` | near-verbatim + PORTING rules |
 | `processes/failure-management.md` | `skills/start/processes/failure-management.md` | near-verbatim + PORTING rules |
 | `processes/failure-reasoning-guidelines.md` | `skills/start/processes/failure-reasoning-guidelines.md` | verbatim |
 | `thinkers/*.md` (6 files) | `agents/*.md` | body near-verbatim; frontmatter converted to Claude Code agent format, upstream metadata moved to a body section |
-| `src/clarity_agent/setup/snippet.md` | `skills/embed/SKILL.md` | adapted for CLAUDE.md / no MCP server; inlined as the embed skill's template section (R16) |
+| `src/clarity_agent/setup/snippet.md` | `skills/embed/SKILL.md` | near-verbatim (plugin provides the MCP server, R12); inlined as the embed skill's template section (R16) |
 | `src/clarity_agent/protocol/packet_status.py` | `scripts/protocol_status.py` | whole file; package imports inlined (see its docstring) |
 | `src/clarity_agent/protocol/initialize.py` | `scripts/protocol_init.py` | adapted (see its docstring); templates verbatim |
-| `skills/risks/security-catalog.csv` | `skills/risks/security-catalog.csv` | verbatim |
+| `src/clarity_agent/mcp/server.py` | `scripts/mcp_server.py` | tool bodies near-verbatim on a stdlib JSON-RPC loop (R17; see its docstring) |
+| `src/clarity_agent/protocol/mailbox.py` | `scripts/mailbox.py` | whole file incl. CLI; app_paths imports inlined (see its docstring) |
+| `src/clarity_agent/ai_actions/brainstorm.py` | `scripts/brainstorm.py` | recording path only; LLM-dispatch surface dropped (see its docstring) |
+| `src/clarity_agent/ai_actions/suggestion.py` | `scripts/suggestion.py` | recording path only; API-backend handler dropped (see its docstring) |
+| `src/clarity_agent/protocol/failure_state.py` | `scripts/protocol_status.py` | inlined into the status engine (audit checks pin header only) |
+| `catalogs/security-catalog.csv` | `skills/risks/security-catalog.csv` | verbatim |
 | `tests/test_packet_status.py` | `tests/test_protocol_status.py` | adapted imports + Mailbox stub (see its docstring) |
 | `tests/conftest.py` | `tests/conftest.py` | fixtures only, keyring/Settings dropped |
+| `tests/test_mcp_server.py` | `tests/test_mcp_tools.py` | adapted (stdlib server, descoped-surface tests dropped; see its docstring) |
+| `tests/test_mailbox.py` | `tests/test_mailbox.py` | near-verbatim, package import flattened |
+| `tests/test_brainstorm_tools.py` | `tests/test_brainstorm.py` | recording-path tests only (see its docstring) |
+| `tests/test_suggestion_tool.py` | `tests/test_suggestion.py` | recording-path tests only (see its docstring) |
 | `LICENSE` | `NOTICE.md` (quoted) | verbatim |
 
 ## Sync policy
 
 **In scope** (the `upstream.json` watch set): process guides, thinkers, the
-security catalog, the protocol scripts (`packet_status.py`, `initialize.py`),
-the agent snippet, the packet-status tests, and the license. New upstream
+security catalog, the protocol scripts (`packet_status.py`, `initialize.py`,
+`mailbox.py`, the `ai_actions` recording modules), the MCP server, the agent
+snippet, their tests, and the license. New upstream
 files appearing under `processes/`, `thinkers/`, or `catalogs/` are surfaced
 by the watcher as adoption candidates; once adopted they join the watch set.
 
 **Out of scope, never ported:** the agent harness — web UI, Tauri desktop
-app, LLM backends, MCP server, evals framework, transcript system,
-installers, dev-tools, and the VS Code extension. Claudity replaces these
+app, LLM backends, the FastMCP framework dependency, evals framework,
+transcript system, installers, dev-tools, and the VS Code extension. Claudity replaces these
 with Claude Code natives. CI's harness-residue lints
 (`tests/test_plugin_structure.py`) guard against accidental bleed-through.
 

@@ -12,7 +12,7 @@ Embed the Clarity Protocol into the current project. Both steps are idempotent �
    python3 "${CLAUDE_PLUGIN_ROOT}/scripts/protocol_init.py" .
    ```
 
-   This creates `.clarity-protocol/` (or `Clarity Protocol/` outside git repos) with template documents and `config.json`, skipping any files that already exist.
+   This creates `.clarity-protocol/` (or `Clarity Protocol/` outside git repos) with template documents, `config.json`, and the suggestions mailbox, skipping anything that already exists.
 
 2. **Install the snippet into CLAUDE.md:** take the template between the `SNIPPET-TEMPLATE` markers below (exclusive), replace every `{{PROTOCOL_DIR_NAME}}` with the actual protocol directory name from step 1, and place the result in the project's root `CLAUDE.md`:
    - If `CLAUDE.md` doesn't exist, create it with the snippet as its content.
@@ -29,21 +29,21 @@ schema_version: 1
 protocol_dir_name: {{PROTOCOL_DIR_NAME}}
 -->
 <!-- Claudity manages this block; edits between the claudity-begin / claudity-end markers will be overwritten when the snippet is refreshed. Put project-specific guidance outside the markers. -->
-<!-- Vendored from microsoft/clarity-agent@6b32c43 src/clarity_agent/setup/snippet.md — modified per PORTING.md rules R2, R3, R4, R5, R6, R10, R12, R16 (MCP tools → Claudity skills and file operations; packet-generator/system-design references trimmed; template inlined in the embed skill) -->
+<!-- Vendored from microsoft/clarity-agent@6b32c43 src/clarity_agent/setup/snippet.md — modified per PORTING.md rules R10, R12, R16 (plugin provides the MCP server; packet-generator reference trimmed; template inlined in the embed skill) -->
 
 ## Clarity Protocol
 
-This project uses the Clarity Protocol for structured thinking about consequential decisions — what to build and why, how it should be designed, where it might fail. Protocol documents live in `{{PROTOCOL_DIR_NAME}}/`. The Claudity plugin manages the protocol — use its skills (`/claudity:start`, `/claudity:status`, and friends) to interact with it.
+This project uses the Clarity Protocol for structured thinking about consequential decisions — what to build and why, how it should be designed, where it might fail. Protocol documents live in `{{PROTOCOL_DIR_NAME}}/`. The Claudity plugin provides the Clarity MCP tools (`clarity-agent` server) and skills (`/claudity:start`, `/claudity:status`, and friends). Use its tools to interact with the protocol — do not try to install or run Clarity directly.
 
 ### When to engage
 
 **Before building — think when it matters.** Two triggers:
 
-1. *The user asks.* When they want to explore what to build, clarify requirements, brainstorm risks, work through a decision, or create or update any protocol document (failure plans, solutions, narratives): use Claudity's `start` skill (`/claudity:start`). Never work on protocol documents freehand — the skills carry required pipeline steps (status checks, pool handling, state recording) that freehand edits silently miss.
+1. *The user asks.* When they want to explore what to build, clarify requirements, brainstorm risks, or work through a decision: call the `run_clarity` MCP tool.
 
-2. *You recognize an inflection point.* Before making choices that would be expensive to reverse — new services, auth/trust models, data schemas, external integrations, significant API contracts — check what you plan to do against the protocol: read `{{PROTOCOL_DIR_NAME}}/decisions/decisions.md`, `goal/requirements.md`, and `solution/architecture.md` for conflicts. Don't interrupt for routine implementation. The test: "If this turns out wrong, is it a 5-minute fix or a multi-day rework?" Interrupt for the latter.
+2. *You recognize an inflection point.* Before making choices that would be expensive to reverse — new services, auth/trust models, data schemas, external integrations, significant API contracts — call `check_decision` with what you plan to do. It returns existing decisions, requirements, and architecture so you can check for conflicts. Don't interrupt for routine implementation. The test: "If this turns out wrong, is it a 5-minute fix or a multi-day rework?" Interrupt for the latter.
 
-**After building — keep the record current.** After significant implementation work (new features, architectural changes), run the `/claudity:status` command (or engage Claudity's `start` skill) to find stale protocol documents — the plugin resolves its own script paths; do not try to locate or run them directly from this file. Update stale documents in place, and let the skill record acceptance. Record significant choices as numbered files in `{{PROTOCOL_DIR_NAME}}/decisions/` (the `/claudity:decide` skill covers the format); add newly-noticed risks to the failure pool via the `/claudity:risks` skill.
+**After building — keep the record current.** After significant implementation work (new features, architectural changes), call `get_packet_status` to find stale protocol documents. Update them with `read_protocol_document` / `write_protocol_document`. Record significant choices with `record_decision`; add risks with `record_failure`.
 
 ### Behaviors (apply throughout)
 

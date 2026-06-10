@@ -3,9 +3,9 @@ name: risks
 description: "Brainstorm failure modes and risks with specialist thinker subagents"
 disable-model-invocation: true
 ---
-<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/failure-brainstorming.md — modified per PORTING.md rules R1, R6, R7, R9, R11, R14: the harness tool pipeline (record_failure / record_suggestion / recommend_deeper_analysis / read_thinker_guide + async mailbox) is replaced by pool files and parallel thinker subagents, R16 (packaged as a skill) -->
+<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/failure-brainstorming.md — modified per PORTING.md rules R9, R11, R16, R17: upstream's ai_actions CLI blocks become the same-named MCP tools from the plugin's clarity-agent server; recommend_deeper_analysis / read_thinker_guide become parallel thinker subagents; the suggestions output path reflects the real mailbox location (upstream's guide says suggestion-box/) -->
 
-This pipeline requires a protocol directory with at least a real problem statement — if that's missing, say so and route through Claudity's `start` skill (problem clarification) first. If the brainstorming pool already has pending items, offer failure-analysis instead (the status script's Process Availability section shows which phase is recommended). If the user named a focus area when invoking this skill, honor it; follow the guide below from the beginning.
+This pipeline requires a protocol directory with at least a real problem statement — if that's missing, say so and route through Claudity's `start` skill (problem clarification) first. If the brainstorming mailbox already has pending items, offer failure-analysis instead (the status script's Process Availability section shows which phase is recommended). If the user named a focus area when invoking this skill, honor it; follow the guide below from the beginning.
 # Failure Brainstorming
 
 This process generates raw failure modes through direct analysis, specialist thinker subagents, and human contributions. Raw failures accumulate in a pool until they're ready for analysis and grouping.
@@ -16,27 +16,19 @@ The goal of failure brainstorming is breadth: come up with as many things as pos
 
 Brainstorming can happen over time. Multiple runs can contribute, humans can add their own insights, and the pool grows until someone decides it's ready for analysis. This process can be run multiple times, each run adding to the same pool.
 
-## Recording Findings
+## Tools Available
 
-Raw failures live in the **brainstorming pool**: `.clarity-protocol/failures/pool/`, one markdown file per failure. **Always record failures with the pool script — never write pool files by hand.** The script owns placement, naming, and format; hand-written files end up in the wrong location and are invisible to the pipeline (the status engine counts only files at the pool's top level — never in `failures/` itself, `pool/archive/`, or any subdirectory).
+You have MCP tools (from the `clarity-agent` server) for recording your findings. **Always use these** — do not write files directly. The tools own placement, naming, and format; hand-written files end up in the wrong location and are invisible to the pipeline.
 
-Record a single failure (your own broad analysis, or a user contribution) as you identify it — don't batch:
+### record_failure
 
-```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/pool_add.py" . broad-analysis --title "Short title of what goes wrong" <<'EOF'
-<1-3 sentences: what fails, how, who is harmed>
+Record a failure mode to the brainstorming mailbox: call the `record_failure` tool with `title` ("Short title of what goes wrong") and `description` ("1-3 sentences: what fails, how, who is harmed").
 
-- **Pre-existing:** yes | no
+Optional fields: `additional_context`, `pre_existing` (boolean).
 
-**Failure chain:** <step> → <step> → <harm>
-EOF
-```
+### record_suggestion
 
-(The description body is free-form; Pre-existing and Failure chain lines are optional. Use source `human (<name or role>)` for user contributions.)
-
-The script prints each pool file it writes — confirm the count matches what you recorded.
-
-When your analysis reveals gaps or ambiguities in project documents (missing stakeholders, uncaptured requirements), append a note to `.clarity-protocol/notes.md` tagged for the relevant document, e.g. `[for: problem-clarification] Stakeholders list is missing the on-call operators surfaced during failure brainstorming.`
+Record a suggestion to improve a project document: call the `record_suggestion` tool with `title`, `target_document` (e.g. `goal/stakeholders.md`), and `suggestion` ("What to add or change").
 
 ## Specialist Thinkers
 
@@ -59,14 +51,8 @@ To launch thinkers (Step 4):
    - the analysis mode: **quick** or **deep**
    - the absolute path to `<plugin-root>/skills/start/processes/failure-reasoning-guidelines.md`
    - for `security-catalog-thinker` only: the absolute path to `<plugin-root>/skills/risks/security-catalog.csv`
-3. Each thinker returns structured `## Failures` / `## Suggestions` / `## Specialist recommendations` blocks. Persist its failures by saving the thinker's full returned text to a temp file and running the pool script, which writes one correctly-placed pool file per failure and prints each path:
-
-   ```bash
-   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/pool_add.py" . <thinker-name> --file /tmp/<thinker-name>-output.md
-   ```
-
-   Confirm the printed count matches the thinker's `## Failures` blocks. Do not write pool files by hand and do not index them in `failures.md`.
-4. Apply suggestions to `notes.md`, and consider any specialist recommendations for the next round.
+3. Each thinker returns structured `## Failures` / `## Suggestions` / `## Specialist recommendations` blocks. Persist its findings with the recording tools: one `record_failure` call per failure block and one `record_suggestion` call per suggestion block, passing `source: <thinker-name>` on each so provenance survives into the mailbox items. Confirm the number of tool calls matches the thinker's `## Failures` blocks. Do not write mailbox files by hand and do not index them in `failures.md`.
+4. Consider any specialist recommendations for the next round.
 
 Check prerequisites before launching: a thinker whose required documents are empty or missing will produce generic output — skip it and tell the user why.
 
@@ -119,12 +105,14 @@ Apply the failure reasoning methodology to analyze the system broadly. Think thr
 - **Misuse scenarios** — How could this be deliberately abused or weaponized?
 - **Cascading failures** — What small problems could snowball into large ones?
 
-As you identify failure modes, **write each one to the pool immediately**. Each failure should:
+As you identify failure modes, **record each one immediately** using `record_failure`. Don't batch them up — record as you go. Each failure should:
 
 - End in actual harm (not just a principle violation)
 - Have a clear title that describes what goes wrong
 - Include enough description to understand the failure without reading the full chain
 - Optionally include a failure chain showing the step-by-step progression
+
+When your analysis reveals gaps or ambiguities in project documents, use `record_suggestion` to note them.
 
 ### Step 3: Recommend Specialist Analysis
 
@@ -140,9 +128,9 @@ Be selective — only recommend specialists whose domain expertise is clearly re
 
 ### Step 4: Deepen on Request
 
-When the user asks for deeper analysis in specific areas, launch the selected thinker subagents as described under **Specialist Thinkers** — in parallel when running several. While they run, you can continue talking with the user. When each returns, persist its findings to the pool and give the user a one-line summary per thinker.
+When the user asks for deeper analysis in specific areas, launch the selected thinker subagents as described under **Specialist Thinkers** — in parallel when running several. While they run, you can continue talking with the user. When each returns, persist its findings with the recording tools and give the user a one-line summary per thinker.
 
-You can also deepen without a specialist — if the user asks you to explore a particular area (e.g., "what about data privacy?"), do so using your own analytical reasoning and the failure reasoning methodology, writing findings to the pool as `broad-analysis`.
+You can also deepen without a specialist — if the user asks you to explore a particular area (e.g., "what about data privacy?"), do so using your own analytical reasoning and the failure reasoning methodology, recording findings with `record_failure`.
 
 ### Step 5: Invite Human Contributions
 
@@ -152,7 +140,7 @@ After your analysis, ask the user:
 
 Human domain experts often know failure modes that general analysis can't discover — organizational dynamics, historical incidents, regulatory subtleties, cultural factors.
 
-If the user contributes failures, help them formulate each one and write it to the pool with Source `human` (or the contributor's name/role if they specify).
+If the user contributes failures, help them formulate each one and record it using `record_failure` with source "human" (or the contributor's name/role if they specify).
 
 ### Step 6: Communicate Results and Hand Off
 
@@ -183,8 +171,9 @@ After any process completes, the user should never be left wondering what happen
 
 This process creates/updates:
 
-- `.clarity-protocol/failures/pool/*.md` — Individual raw failure mode files
-- `.clarity-protocol/notes.md` — Document improvement suggestions, tagged `[for: ...]` (if any)
+- `.clarity-protocol/mailboxes/failure-brainstorm/*.md` — Individual raw failure mode files
+- `.clarity-protocol/mailboxes/failure-brainstorm/_config.json` — Mailbox configuration and status
+- `.clarity-protocol/mailboxes/suggestions/*.md` — Document improvement suggestions (if any)
 
 ## Success Indicators
 
@@ -215,7 +204,7 @@ Automated analysis works from general domain knowledge. Humans know the specific
 
 **Pitfall: Not recording as you go**
 
-Write each failure to the pool as you identify it — don't try to batch them. This ensures nothing is lost and the user can see progress in real time.
+Use `record_failure` as you identify each failure — don't try to batch them. This ensures nothing is lost and the user can see progress in real time.
 
 **Pitfall: Launching thinkers serially**
 

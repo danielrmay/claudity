@@ -1,4 +1,4 @@
-<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/failure-analysis.md — modified per PORTING.md rules R1, R10, R14 -->
+<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/failure-analysis.md — modified per PORTING.md rules R1, R8, R10, R17, R18 -->
 
 # Failure Analysis
 
@@ -27,7 +27,7 @@ Run this process when:
 
 Before starting, you should have:
 
-- Raw failure modes in the brainstorming pool, `.clarity-protocol/failures/pool/` (from brainstorming)
+- Raw failure modes in a brainstorming mailbox (from brainstorming)
 - `processes/failure-reasoning-guidelines.md` — Shared guidelines on analyzing the complete system and focusing on meaningful harm. Read these first; they inform how you triage and analyze failures.
 - `.clarity-protocol/goal/problem.md` — Context for what's being built
 - `.clarity-protocol/goal/stakeholders.md` — Who is affected
@@ -40,7 +40,13 @@ If existing failure mode documents already exist in `.clarity-protocol/failures/
 
 ### Step 1: Set Up
 
-**Consume the pool** by taking a snapshot: move every `.md` file currently in `.clarity-protocol/failures/pool/` into `.clarity-protocol/failures/pool/archive/<YYYY-MM-DD>/` (create the directory; add a `-2`, `-3` suffix if the date directory already exists), and work from that snapshot. Any new brainstorming that happens during analysis drops new files into the pool, while analysis works from the stable snapshot. (For packets created by upstream Clarity, also treat any items in `.clarity-protocol/mailboxes/failure-brainstorm/` as part of the pool and archive them the same way.)
+**Consume the mailbox** by taking a snapshot:
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/mailbox.py" snapshot --name failure-brainstorm
+```
+
+This moves all items from the mailbox into `archive/failure-brainstorm/snapshot-YYYYMMDD-HHMMSS/`, leaving the mailbox empty. Any new brainstorming that happens during analysis goes into the same mailbox, while analysis works from the stable snapshot. (For packets created by Claudity 0.2 or earlier, also treat any `.clarity-protocol/failures/pool/*.md` items as part of the mailbox and move them into the same snapshot directory.)
 
 **Load context**: Read the problem, stakeholders, solution, architecture, the shared failure reasoning guidelines (`failure-reasoning-guidelines.md`, alongside this guide), and any existing failure mode documents in `.clarity-protocol/failures/`.
 
@@ -159,7 +165,7 @@ Sometimes the user wants to look at a group that's been formed — to check the 
 Sometimes the discussion surfaces new "what could go wrong" ideas that weren't in the original pool.
 
 - Have a freeform conversation about what else could go wrong
-- Record any new raw failures via `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/pool_add.py" . failure-analysis --title "..."` (description on stdin; one call per failure)
+- Record any new raw failures via the `record_failure` tool (source `failure-analysis`; one call per failure)
 - These become available for Activity A in the next iteration of the loop
 
 #### Breaking Out

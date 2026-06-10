@@ -236,6 +236,20 @@ class TestRecordFailure:
         )
         assert "Recorded failure" in result
 
+    def test_source_reaches_mailbox_item(self, initialized_project: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Claudity R17 deviation: optional source preserves thinker/human provenance."""
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(initialized_project))
+        from mailbox import protocol_dir
+        from mcp_server import record_failure
+        record_failure(
+            title="Token replay",
+            description="Stolen token reused; user data leaks.",
+            source="security-thinker",
+        )
+        box = protocol_dir(initialized_project) / "mailboxes" / "failure-brainstorm"
+        (item,) = list(box.glob("*.md"))
+        assert "**Source:** security-thinker" in item.read_text()
+
 
 class TestRecordSuggestion:
     def test_records_suggestion(self, initialized_project: Path, monkeypatch: pytest.MonkeyPatch) -> None:

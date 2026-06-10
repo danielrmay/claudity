@@ -29,6 +29,11 @@ Copyright (c) Microsoft Corporation). Modifications per PORTING.md (R17):
   Claude Code (protocol docs via the Read tool, process guides are skill
   bodies, thinker guides are agents), and ``clarity://behaviors`` depends
   on the AGENTS.md machinery Claudity replaces with the embed skill.
+- ``record_failure`` / ``record_suggestion`` gain an optional ``source``
+  parameter (upstream's MCP signatures hardcode source="mcp"). Claudity's
+  orchestrator records on behalf of thinker subagents and human
+  contributors, so provenance must travel through the tool call —
+  upstream preserved it via per-thinker mailbox writers instead.
 """
 
 from __future__ import annotations
@@ -415,6 +420,7 @@ def record_failure(
     description: str,
     additional_context: str = "",
     pre_existing: bool | None = None,
+    source: str = "mcp",
     project_dir: str | None = None,
 ) -> str:
     """Record a potential failure mode during brainstorming.
@@ -430,7 +436,7 @@ def record_failure(
         proto_dir,
         title=title,
         description=description,
-        source="mcp",
+        source=source,
         additional_context=additional_context,
         pre_existing=pre_existing,
     )
@@ -442,6 +448,7 @@ def record_suggestion(
     target_document: str,
     suggestion: str,
     rationale: str = "",
+    source: str = "mcp",
     project_dir: str | None = None,
 ) -> str:
     """Record a suggestion to update a project document.
@@ -459,7 +466,7 @@ def record_suggestion(
         title=title,
         target_document=target_document,
         suggestion=suggestion,
-        source="mcp",
+        source=source,
         rationale=rationale,
     )
     return msg
@@ -571,6 +578,10 @@ TOOLS: list[dict] = [
                     "type": "boolean",
                     "description": "Optional: true if this failure also exists (at similar or greater severity) in the world before this solution is implemented.",
                 },
+                "source": {
+                    "type": "string",
+                    "description": "Optional: where this failure came from — a thinker name, 'human (<name or role>)' for user contributions, or omitted for your own analysis.",
+                },
             },
             ["title", "description"],
         ),
@@ -587,6 +598,10 @@ TOOLS: list[dict] = [
                 },
                 "suggestion": {"type": "string", "description": "The suggested content to add or change."},
                 "rationale": {"type": "string", "description": "Optional: why this update is needed."},
+                "source": {
+                    "type": "string",
+                    "description": "Optional: where this suggestion came from — a thinker name, or omitted for your own analysis.",
+                },
             },
             ["title", "target_document", "suggestion"],
         ),

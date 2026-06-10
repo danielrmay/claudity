@@ -1,4 +1,4 @@
-<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/failure-management.md — modified per PORTING.md rules R1, R6, R10 -->
+<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/failure-management.md — modified per PORTING.md rules R1, R10, R17 -->
 
 # Failure Management
 
@@ -261,7 +261,7 @@ Common examples:
 - Automated rollback creates "rollback oscillation" failure mode
 - Monitoring creates "alert fatigue" failure mode
 
-If you identify induced failures, add each as a raw failure mode to the brainstorming pool for the next analysis cycle: `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/pool_add.py" . failure-management --title "..."` (description on stdin). Note the connection in both documents.
+If you identify induced failures, add each as a raw failure mode with the `record_failure` tool (source `failure-management`) for the next analysis cycle. Note the connection in both documents.
 
 **If any intervention introduces a new component** — incident response, monitoring infrastructure, manual review workflows — note that this component needs its own design pass (Principle 6). It's a new part of the solution, and the full design process applies to it. At minimum, make sure the management plan answers the key design questions for that component (who operates it, what SLAs apply, what access is needed, whether staffing is adequate).
 
@@ -300,7 +300,7 @@ This process updates:
 
 - `.clarity-protocol/failures/failure-NN-name.md` — Management Plan sections filled in
 - `.clarity-protocol/failures/failures.md` — Index updated with management status
-- `.clarity-protocol/failures/pool/*.md` — New raw failures if interventions induce them
+- `.clarity-protocol/mailboxes/failure-brainstorm/*.md` — New raw failures if interventions induce them
 - `.clarity-protocol/goal/stakeholders.md` — If new stakeholders or goals are discovered
 - `.clarity-protocol/goal/requirements.md` — If requirements change based on management analysis
 - `.clarity-protocol/solution/solution.md` — If the management plan requires solution changes

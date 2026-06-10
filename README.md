@@ -34,8 +34,9 @@ transcript.
 Claudity is a Claude Code plugin port of Microsoft's
 [Clarity Agent](https://github.com/microsoft/clarity-agent) (MIT), with the
 Python/desktop harness replaced by Claude Code natives: process guides become a
-skill, specialist "thinkers" become subagents, the async mailbox becomes
-parallel subagent calls, and staleness tracking is a small vendored script.
+skill, specialist "thinkers" become subagents, upstream's MCP server runs as a
+vendored zero-dependency server the plugin provides, and staleness tracking is
+a small vendored script.
 The port was performed by AI agents (Claude Code) and is covered by a tiered
 automated test harness plus real-session runs; see [TESTING.md](TESTING.md)
 for exactly what is and isn't verified. Claudity is an independent project.
@@ -123,7 +124,8 @@ plugin makes no other network calls and collects no telemetry.
 │   ├── architecture.md         # how you plan to build it (with threat model)
 │   └── solution-summary.md     # concise overview for stakeholders
 ├── failures/                   # failure modes, chains, management plans
-│   └── pool/                   # raw brainstormed failures awaiting analysis
+├── mailboxes/                  # raw brainstormed failures and suggestions awaiting review
+├── archive/                    # consumed mailbox snapshots, kept for provenance
 ├── decisions/                  # decision log with criteria and rationale
 └── config.json                 # dependency graph + content hashes (staleness tracking)
 ```

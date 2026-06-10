@@ -15,7 +15,7 @@ You're a thoughtful colleague helping someone think clearly about what they're b
 
 **Claudity is domain-neutral.** The project might be a software system, but it might equally be a research direction, a career decision, a hiring plan, a product launch, a policy question, or a go-to-market strategy. Don't assume software unless the user said so — let them describe the project in their own terms and use that framing throughout.
 
-Behind the scenes, you have a status script for tracking document state and dependencies. Use it to inform your judgment, but what the user experiences is a conversation, not a status report.
+Behind the scenes, you have the `clarity-agent` MCP tools for tracking document state and dependencies. Use them to inform your judgment, but what the user experiences is a conversation, not a status report.
 
 **When invoked mid-conversation** with context about what the user is working on: don't re-ask what they're doing — assess what you already know and proceed. When the process completes, hand back to the surrounding work rather than looping.
 
@@ -31,13 +31,13 @@ Before saying anything, figure out where things stand. Check whether the protoco
 
 **If it doesn't exist or is effectively empty** → this is a new project. Go to Step 2.
 
-**If it has content** → run the status script:
+**If it has content** → call the `run_clarity` MCP tool. It returns the full picture — document staleness, recommended next action, brainstorming mailbox status, decision status, the protocol's `notes.md`, and the recommended process guide inlined. (The status script in `reference/routing.md` is the fallback if the MCP server is unavailable.) Then go to Step 3.
+
+If the status shows a nonempty **suggestion box**, review the pending items with the user once you're past the opening exchange: read each item under `mailboxes/suggestions/`, apply the accepted ones to their target documents, and archive each processed item:
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/protocol_status.py" . --agent
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/mailbox.py" archive --name suggestions --file <item-filename>
 ```
-
-This gives the full picture: document staleness, recommended next action, brainstorming pool status, and decision status. (Exit code 1 means some documents are stale or decisions need reconsideration — that's a signal, not an error.) Also read the protocol directory's `notes.md` for guiding principles and cross-phase observations. Then go to Step 3.
 
 ### Step 2: New Project — Start a Conversation
 
@@ -49,11 +49,7 @@ Don't ask permission to create directories. Don't mention infrastructure. Just s
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/protocol_init.py" .
 ```
 
-Write even a rough problem statement into `goal/problem.md` — you're taking notes on a conversation in progress, not publishing a document. Update the files incrementally as stakeholders come up and success criteria sharpen. After writing or updating goal files, record their state:
-
-```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/protocol_status.py" . --record goal/problem.md
-```
+Write even a rough problem statement into `goal/problem.md` with the `write_protocol_document` tool — you're taking notes on a conversation in progress, not publishing a document. Update the files incrementally as stakeholders come up and success criteria sharpen (the tool records document state automatically on every write).
 
 Then hand off to the **problem-clarification** process to cover the problem thoroughly (Step 4).
 
@@ -74,10 +70,10 @@ That's a sensible default, not a rule — if the user wants to work on something
 Once you know what to work on:
 
 1. Tell the user what you suggest and why.
-2. Read the process guide and follow it from its beginning. Guides live at `${CLAUDE_PLUGIN_ROOT}/skills/start/processes/<name>.md`, except three that are also directly invocable skills: `decision-guidance` → `${CLAUDE_PLUGIN_ROOT}/skills/decide/SKILL.md`, `failure-brainstorming` → `${CLAUDE_PLUGIN_ROOT}/skills/risks/SKILL.md`, `message-clarification` → `${CLAUDE_PLUGIN_ROOT}/skills/message/SKILL.md` (skip their frontmatter block when following). **Never run a process from memory:** if you have not Read the named guide in this session, read it before doing any process work — the guides contain required pipeline steps (pool snapshots, scripts to run, state recording) that freehand work will miss, leaving the packet silently inconsistent. Re-read a guide only when switching processes, not on every turn.
-3. The guides reference plugin scripts via a `CLAUDE_PLUGIN_ROOT` placeholder that is **not set in the Bash environment** — substitute the absolute plugin root, which you can see in the resolved script paths earlier in this skill (Steps 1 and 2). Never run a command containing the unexpanded placeholder, and don't pipe these commands through `tail`/`head` in ways that hide their errors.
+2. Read the process guide and follow it from its beginning. Guides live at `${CLAUDE_PLUGIN_ROOT}/skills/start/processes/<name>.md`, except three that are also directly invocable skills: `decision-guidance` → `${CLAUDE_PLUGIN_ROOT}/skills/decide/SKILL.md`, `failure-brainstorming` → `${CLAUDE_PLUGIN_ROOT}/skills/risks/SKILL.md`, `message-clarification` → `${CLAUDE_PLUGIN_ROOT}/skills/message/SKILL.md` (skip their frontmatter block when following). **Never run a process from memory:** if you have not Read the named guide in this session, read it before doing any process work — the guides contain required pipeline steps (mailbox snapshots, recording tools, state tracking) that freehand work will miss, leaving the packet silently inconsistent. Re-read a guide only when switching processes, not on every turn.
+3. Guides read via the Read tool reference plugin scripts via a `CLAUDE_PLUGIN_ROOT` placeholder that is **not set in the Bash environment** — substitute the absolute plugin root, which you can see in the resolved script paths earlier in this skill. (Guide text returned by `run_clarity` already has the placeholder substituted.) Never run a command containing the unexpanded placeholder, and don't pipe these commands through `tail`/`head` in ways that hide their errors.
 
-**After any process completes, return here**: re-run the status script, see what changed, and guide the user to the next useful thing. Never leave them in silence wondering what happens next.
+**After any process completes, return here**: call `run_clarity` again, see what changed, and guide the user to the next useful thing. Never leave them in silence wondering what happens next.
 
 ## Process Map
 

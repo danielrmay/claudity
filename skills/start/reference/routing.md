@@ -6,6 +6,14 @@ Read this when assessing an existing project (SKILL.md Step 3). It covers what
 the status output alone can't decide: quality judgment, discovery routing,
 narrative freshness, and decision reconsideration.
 
+If the `clarity-agent` MCP server is unavailable, the status assessment
+fallback is the script (exit code 1 means stale documents — a signal, not an
+error):
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/protocol_status.py" . --agent
+```
+
 ## Stale or empty documents
 
 Upstream problems need addressing before downstream documents are meaningful.

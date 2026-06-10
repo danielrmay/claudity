@@ -65,12 +65,18 @@ suite fails if a sequential run's total exceeds the budget.
 | 01-embed | `/claudity:embed` scaffolds the packet (9 empty docs) and installs the CLAUDE.md snippet with markers and no unexpanded placeholders |
 | 02-routing | `/claudity:status` runs the status script and correctly relays the recommended next process for a fixture packet |
 | 03-decide | `/claudity:decide` produces a real decision document, updates the index, and records `decisionState` (status `decided`, non-empty `relatedDocs`) |
-| 04-thinker | failure-brainstorming launches the `general-thinker` subagent and persists its findings to `failures/pool/`, flipping the status engine to recommend `failure-analysis` |
+| 04-thinker | failure-brainstorming launches the `general-thinker` subagent and records its findings into `mailboxes/failure-brainstorm/` via `record_failure`, flipping the status engine to recommend `failure-analysis` |
 | 05-solution | solution-brainstorming fills a blanked `solution.md` + `solution-summary.md` with real content and records them as current |
 | 06-architecture | architecture-design writes `architecture.md` with the Mermaid threat-model block plus a valid `system-design.json`, and records state |
-| 07-analysis | failure-analysis snapshots seeded pool files to `pool/archive/`, produces analyzed `failure-NN` documents and a real index, and records state |
+| 07-analysis | failure-analysis snapshots seeded mailbox items to `archive/failure-brainstorm/snapshot-*/`, produces analyzed `failure-NN` documents and a real index, and records state |
 | 08-management | failure-management replaces a seeded placeholder `## Management Plan` with a real plan; the status engine stops recommending the phase |
 | 09-message | message-clarification writes a non-template general-audience `summary.md` and records it |
+| 10-record | the headless MCP canary: an ambient risk report lands as exactly one `mailboxes/failure-brainstorm/` item via the `record_failure` tool |
+
+When iterating on `scripts/mcp_server.py`, remember MCP servers spawn at
+session start — interactive sessions need a restart (or `/reload-plugins`) to
+pick up server edits; `tests/test_mcp_protocol.py` drives a fresh process per
+test, so pytest always sees the current code.
 
 Discovery (`discovery-research` / `discovery-prototype`) remains uncovered:
 their outputs are investigation programs and disposable prototypes with no

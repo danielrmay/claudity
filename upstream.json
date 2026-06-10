@@ -89,7 +89,7 @@
       "local": "scripts/protocol_init.py"
     },
     {
-      "upstream": "skills/risks/security-catalog.csv",
+      "upstream": "catalogs/security-catalog.csv",
       "local": "skills/risks/security-catalog.csv"
     },
     {
@@ -99,6 +99,43 @@
     {
       "upstream": "tests/conftest.py",
       "local": "tests/conftest.py"
+    },
+    {
+      "upstream": "src/clarity_agent/mcp/server.py",
+      "local": "scripts/mcp_server.py"
+    },
+    {
+      "upstream": "src/clarity_agent/protocol/mailbox.py",
+      "local": "scripts/mailbox.py"
+    },
+    {
+      "upstream": "src/clarity_agent/ai_actions/brainstorm.py",
+      "local": "scripts/brainstorm.py"
+    },
+    {
+      "upstream": "src/clarity_agent/ai_actions/suggestion.py",
+      "local": "scripts/suggestion.py"
+    },
+    {
+      "upstream": "src/clarity_agent/protocol/failure_state.py",
+      "local": "scripts/protocol_status.py",
+      "fidelity": "inlined"
+    },
+    {
+      "upstream": "tests/test_mcp_server.py",
+      "local": "tests/test_mcp_tools.py"
+    },
+    {
+      "upstream": "tests/test_mailbox.py",
+      "local": "tests/test_mailbox.py"
+    },
+    {
+      "upstream": "tests/test_brainstorm_tools.py",
+      "local": "tests/test_brainstorm.py"
+    },
+    {
+      "upstream": "tests/test_suggestion_tool.py",
+      "local": "tests/test_suggestion.py"
     },
     {
       "upstream": "LICENSE",
