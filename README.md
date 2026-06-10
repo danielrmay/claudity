@@ -19,8 +19,7 @@ written to versionable markdown in the repo.
 ```
 
 Requires Claude Code (a recent version with plugin support), `python3` 3.10+
-on PATH (the bundled scripts are stdlib-only, nothing to pip install), and
-`git`. Tested on macOS and Linux.
+on PATH, and `git`. Tested on macOS and Linux.
 
 <details>
 <summary>Windows notes</summary>
