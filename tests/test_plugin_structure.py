@@ -54,7 +54,7 @@ FORBIDDEN_RESIDUE = ["python -m clarity_agent", "`read_thinker_guide`", "pool_ad
 
 def parse_frontmatter(path: Path) -> dict[str, str]:
     """Naive single-level YAML frontmatter parser (no dependencies)."""
-    lines = path.read_text().splitlines()
+    lines = path.read_text(encoding="utf-8").splitlines()
     assert lines and lines[0] == "---", f"{path} has no frontmatter"
     end = lines[1:].index("---") + 1
     fm: dict[str, str] = {}
@@ -66,7 +66,7 @@ def parse_frontmatter(path: Path) -> dict[str, str]:
 
 
 def frontmatter_block(path: Path) -> str:
-    lines = path.read_text().splitlines()
+    lines = path.read_text(encoding="utf-8").splitlines()
     end = lines[1:].index("---") + 1
     return "\n".join(lines[1:end])
 
@@ -85,13 +85,13 @@ def repo_markdown_files() -> list[Path]:
 
 class TestManifests:
     def test_plugin_json(self) -> None:
-        data = json.loads((REPO / ".claude-plugin" / "plugin.json").read_text())
+        data = json.loads((REPO / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
         assert data["name"] == "claudity"
         assert data["version"]
         assert data["description"]
 
     def test_marketplace_json(self) -> None:
-        data = json.loads((REPO / ".claude-plugin" / "marketplace.json").read_text())
+        data = json.loads((REPO / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8"))
         assert data["name"] == "claudity"
         plugins = data["plugins"]
         assert len(plugins) == 1
@@ -99,8 +99,8 @@ class TestManifests:
         assert (REPO / source / ".claude-plugin" / "plugin.json").exists()
 
     def test_versions_agree(self) -> None:
-        plugin = json.loads((REPO / ".claude-plugin" / "plugin.json").read_text())
-        market = json.loads((REPO / ".claude-plugin" / "marketplace.json").read_text())
+        plugin = json.loads((REPO / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
+        market = json.loads((REPO / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8"))
         assert plugin["version"] == market["plugins"][0]["version"]
 
 
@@ -137,7 +137,7 @@ class TestFrontmatter:
 
     def test_guide_skills_carry_vendor_headers(self) -> None:
         for skill, process in GUIDE_SKILLS.items():
-            text = (SKILLS_DIR / skill / "SKILL.md").read_text()
+            text = (SKILLS_DIR / skill / "SKILL.md").read_text(encoding="utf-8")
             assert f"processes/{process}.md" in text.splitlines()[5], (
                 f"{skill}: vendor header for {process} missing under frontmatter"
             )
@@ -169,14 +169,14 @@ class TestCrossReferences:
         pattern = re.compile(r"\$\{CLAUDE_PLUGIN_ROOT\}/([\w\-./]+)")
         missing: list[str] = []
         for md in repo_markdown_files():
-            for ref in pattern.findall(md.read_text()):
+            for ref in pattern.findall(md.read_text(encoding="utf-8")):
                 if not (REPO / ref).exists():
                     missing.append(f"{md.relative_to(REPO)} -> {ref}")
         assert not missing, f"dangling plugin-root references: {missing}"
 
     def test_process_map_matches_files(self) -> None:
         """SKILL.md's Process Map and the processes/ directory agree."""
-        body = SKILL_MD.read_text()
+        body = SKILL_MD.read_text(encoding="utf-8")
         map_section = body.split("## Process Map")[1].split("##")[0]
         mapped = set(re.findall(r"- \*\*([\w-]+)\*\*", map_section))
         on_disk = {f.stem for f in PROCESSES_DIR.glob("*.md")} | set(GUIDE_SKILLS.values())
@@ -188,7 +188,7 @@ class TestCrossReferences:
 
     def test_thinker_table_matches_agents(self) -> None:
         """failure-brainstorming.md's thinker table names real agents."""
-        body = (SKILLS_DIR / "risks" / "SKILL.md").read_text()
+        body = (SKILLS_DIR / "risks" / "SKILL.md").read_text(encoding="utf-8")
         table_section = body.split("## Specialist Thinkers")[1].split("## When")[0]
         listed = set(re.findall(r"^\| `([\w-]+)`", table_section, re.MULTILINE))
         assert listed == EXPECTED_AGENTS
@@ -215,14 +215,14 @@ class TestPortingInvariants:
     def test_vendor_headers_present(self) -> None:
         missing = [
             str(f.relative_to(REPO)) for f in self.vendored_files()
-            if VENDOR_HEADER not in f.read_text()
+            if VENDOR_HEADER not in f.read_text(encoding="utf-8")
         ]
         assert not missing, f"vendored files without upstream header: {missing}"
 
     def test_no_harness_residue(self) -> None:
         hits: list[str] = []
         for f in self.vendored_files() + [SKILL_MD]:
-            text = f.read_text()
+            text = f.read_text(encoding="utf-8")
             for bad in FORBIDDEN_RESIDUE:
                 if bad in text:
                     hits.append(f"{f.relative_to(REPO)}: {bad}")
@@ -246,7 +246,7 @@ class TestProtocolScaffolding:
         assert set(report["summary"]["empty"]) == set(DEFAULT_DEPENDENCIES)
 
     def snippet_template(self) -> str:
-        body = (REPO / "skills" / "embed" / "SKILL.md").read_text()
+        body = (REPO / "skills" / "embed" / "SKILL.md").read_text(encoding="utf-8")
         start = body.index("SNIPPET-TEMPLATE-BEGIN")
         end = body.index("SNIPPET-TEMPLATE-END")
         return body[start:end]
@@ -267,8 +267,8 @@ class TestProtocolScaffolding:
         """Packets record which Claudity version scaffolded them."""
         (tmp_path / ".git").mkdir()
         pd = init_protocol(tmp_path)
-        cfg = json.loads((pd / "config.json").read_text())
-        plugin = json.loads((REPO / ".claude-plugin" / "plugin.json").read_text())
+        cfg = json.loads((pd / "config.json").read_text(encoding="utf-8"))
+        plugin = json.loads((REPO / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
         assert cfg["claudity"]["version"] == plugin["version"]
 
 
@@ -284,7 +284,7 @@ class TestMcpServer:
     }
 
     def test_mcp_json_declares_clarity_agent(self) -> None:
-        cfg = json.loads((REPO / ".mcp.json").read_text())
+        cfg = json.loads((REPO / ".mcp.json").read_text(encoding="utf-8"))
         assert set(cfg["mcpServers"]) == {"clarity-agent"}
         server = cfg["mcpServers"]["clarity-agent"]
         assert server["command"] == "python3"
@@ -318,7 +318,7 @@ class TestRepoHygiene:
         scenarios depend on; a stray session once 'analyzed' it in place.
         Any change must be deliberate (update this manifest when curating)."""
         root = REPO / "tests" / "e2e" / "fixtures" / "feature-flags-cli" / ".clarity-protocol"
-        actual = {str(f.relative_to(root)) for f in root.rglob("*") if f.is_file()}
+        actual = {f.relative_to(root).as_posix() for f in root.rglob("*") if f.is_file()}
         expected = {
             "config.json", "notes.md", "observations.md", "summary.md",
             "goal/problem.md", "goal/stakeholders.md", "goal/requirements.md",
@@ -341,7 +341,7 @@ class TestRepoHygiene:
         """examples/dev-db-snap is a frozen real-session packet; protect it
         from stray e2e sessions the same way as the fixture."""
         root = REPO / "examples" / "dev-db-snap" / ".clarity-protocol"
-        actual = {str(f.relative_to(root)) for f in root.rglob("*") if f.is_file()}
+        actual = {f.relative_to(root).as_posix() for f in root.rglob("*") if f.is_file()}
         expected = {
             "config.json",
             "decisions/decisions.md",
@@ -365,7 +365,7 @@ class TestRepoHygiene:
     def test_showcase_goal_docs_are_real(self) -> None:
         root = REPO / "examples" / "dev-db-snap" / ".clarity-protocol"
         for doc in ("goal/problem.md", "goal/stakeholders.md", "goal/requirements.md"):
-            text = (root / doc).read_text()
+            text = (root / doc).read_text(encoding="utf-8")
             assert "[To be determined" not in text and len(text) > 300, f"{doc} looks skeletal"
 
 
@@ -383,7 +383,7 @@ class TestUpstreamPin:
     }
 
     def upstream_config(self) -> dict:
-        return json.loads((REPO / "upstream.json").read_text())
+        return json.loads((REPO / "upstream.json").read_text(encoding="utf-8"))
 
     def test_watch_locals_exist(self) -> None:
         cfg = self.upstream_config()
@@ -398,14 +398,14 @@ class TestUpstreamPin:
             local = entry["local"]
             if local in self.HEADER_EXEMPT:
                 continue
-            if f"clarity-agent@{short}" not in (REPO / local).read_text():
+            if f"clarity-agent@{short}" not in (REPO / local).read_text(encoding="utf-8"):
                 stale.append(local)
         assert not stale, f"vendored files whose header pin != upstream.json pin: {stale}"
 
     def test_full_pin_in_docs(self) -> None:
         pin = self.upstream_config()["pin"]
         for doc in ("NOTICE.md", "UPSTREAM.md"):
-            assert pin in (REPO / doc).read_text(), f"{doc} missing the full pin {pin}"
+            assert pin in (REPO / doc).read_text(encoding="utf-8"), f"{doc} missing the full pin {pin}"
 
     def test_vendored_files_all_watched(self) -> None:
         """Every file carrying a vendor header appears in the watch set."""
@@ -416,7 +416,7 @@ class TestUpstreamPin:
         unwatched = [
             str(p.relative_to(REPO))
             for p in repo_markdown_files()
-            if "clarity-agent@" in p.read_text()
+            if "clarity-agent@" in p.read_text(encoding="utf-8")
             and str(p.relative_to(REPO)) not in watched | rewrites | self.HEADER_EXEMPT
             # examples/ holds rendered artifacts of watched files (e.g. the
             # embedded CLAUDE.md rendered from the snippet), not vendoring units
