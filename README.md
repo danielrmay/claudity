@@ -1,60 +1,17 @@
-# 🧊 Claudity
+# Claudity
 
-An AI thinking partner that pushes back, for Claude Code.
+<p align="center">
+  <img src="assets/hero.gif" width="800" alt="A simulated Claudity conversation: the user asks for a tool that pulls prod data into dev, Claudity asks what breaks today and whether prod rows contain customer PII, then records anonymization requirements to .clarity-protocol/goal/requirements.md">
+</p>
 
-> 🧑‍💻 &nbsp;**You:** I want to build a CLI tool that snapshots and restores
-> local dev databases.
->
-> 🧊 &nbsp;**Claudity:** I can already imagine the tool — but I want to make
-> sure I understand the *pain* first, because "a snapshot CLI" is an
-> artifact. [...] The magic-wand test: if snapshot/restore already existed
-> and worked perfectly, what would you actually do differently day-to-day?
->
-> 💬 &nbsp;*a few answers later...*
->
-> 🧊 &nbsp;**Claudity:** **You're not building a snapshot tool — you're
-> building a state-sharing tool.** Every detail you just gave — push/pull,
-> names like `bug-1234`, credentials, "who has which version" — describes a
-> *distribution* problem. [...] What's actually *in* these dev databases?
-> [...] if dev DBs ever contain production-derived rows [...] then
-> `snap push` is quietly building an unaudited archive of customer data,
-> copied to a bucket and six laptops.
+Claude Code, but it makes sure you're building the right thing: Claudity asks
+the questions an architect would ask, and records the answers and decisions as
+markdown in your repo.
 
-✨ Real session, abridged — [full transcript](EXAMPLE.md). Three
-turns in, the project has a different shape, a privacy requirement nobody had
-thought about, and all of it written to versionable markdown in the repo.
-
-Claudity helps you figure out whether you're building the right thing in the
-first place, by asking the questions an experienced architect, product manager,
-or safety engineer would ask. The answers are written down as plain markdown
-in a `.clarity-protocol/` directory in your repo: committed, reviewed in PRs,
-and diffed like any other source file. Nothing lives only in a chat
-transcript.
-
-Claudity is a Claude Code plugin port of Microsoft's
-[Clarity Agent](https://github.com/microsoft/clarity-agent) (MIT), with the
-Python/desktop harness replaced by Claude Code natives: process guides become a
-skill, specialist "thinkers" become subagents, upstream's MCP server runs as a
-vendored zero-dependency server the plugin provides, and staleness tracking is
-a small vendored script.
-The port was performed by AI agents (Claude Code) and is covered by a tiered
-automated test harness plus real-session runs; see [TESTING.md](TESTING.md)
-for exactly what is and isn't verified. Claudity is an independent project.
-It is not affiliated with or endorsed by Microsoft or Anthropic. See
-[NOTICE.md](NOTICE.md).
-
-## Prerequisites
-
-- Claude Code with plugin support (a recent version)
-- `python3` 3.10+ on PATH (the bundled scripts are stdlib-only)
-- `git` (the protocol directory is designed to be committed)
-- Tested on macOS and Linux. On Windows: the Python layer (including the
-  bundled MCP server) is CI-verified on `windows-latest`, but Claude Code
-  itself running the plugin natively on Windows has not been validated.
-  Two known requirements: Claude Code's Bash tool needs Git for Windows,
-  and the plugin invokes `python3` — the python.org installer registers
-  `python`/`py` but not `python3` (the Microsoft Store build does; or
-  create an alias/shim so `python3` resolves)
+The animation above is a simulation. For a real session (abridged only for
+length) see [EXAMPLE.md](EXAMPLE.md): three turns in, the project has a
+different shape, a privacy requirement nobody had thought about, and all of it
+written to versionable markdown in the repo.
 
 ## Install
 
@@ -63,23 +20,39 @@ It is not affiliated with or endorsed by Microsoft or Anthropic. See
 /plugin install claudity@claudity
 ```
 
+Requires Claude Code (a recent version with plugin support), `python3` 3.10+
+on PATH (the bundled scripts are stdlib-only, nothing to pip install), and
+`git`. Tested on macOS and Linux.
+
+<details>
+<summary>Windows notes</summary>
+
+The Python layer (including the bundled MCP server) is CI-verified on
+`windows-latest`, but Claude Code itself running the plugin natively on
+Windows has not been validated. Two known requirements:
+
+- Claude Code's Bash tool needs Git for Windows.
+- The plugin invokes `python3`. The python.org installer registers
+  `python`/`py` but not `python3` (the Microsoft Store build does), so create
+  an alias or shim if `python3` doesn't resolve.
+
+</details>
+
 ## Quickstart
 
 1. In your project, run `/claudity:embed`. This scaffolds `.clarity-protocol/`
    with template documents and adds a managed block to your `CLAUDE.md`.
-2. Just describe what you're building (or run `/claudity:start`). Claudity
-   asks questions and writes what it learns into the protocol documents as
-   you talk; ending a session mid-thought loses nothing.
+2. Describe what you're building (or run `/claudity:start`). Claudity asks
+   questions and writes what it learns into the protocol documents as you
+   talk; ending a session mid-thought loses nothing.
 3. Next session, run `/claudity:status` (or just keep talking): it reads the
    document state and picks up where you left off.
 
 The common path is problem clarification → solution → failure analysis →
 architecture; everything else (discovery, decisions, messaging) is invoked on
-demand. See the [example session](EXAMPLE.md) for what the first
-conversation looks like, and [tests/e2e/fixtures/feature-flags-cli](tests/e2e/fixtures/feature-flags-cli)
-for a complete protocol directory.
+demand.
 
-## Use
+## Commands
 
 - `/claudity:embed` wires the Clarity Protocol into the current project
   (scaffolds `.clarity-protocol/`, installs a snippet into `CLAUDE.md`)
@@ -89,18 +62,41 @@ for a complete protocol directory.
 - `/claudity:risks` brainstorms failure modes with specialist thinker subagents
 - `/claudity:message` builds the project narrative and audience-specific messaging
 
-Or just talk: with the plugin enabled, Claude engages Claudity's router skill when
-you want to explore what to build, clarify requirements, brainstorm risks, or
-make a consequential choice.
+Or just talk: with the plugin enabled, Claude engages Claudity's router skill
+when you want to explore what to build, clarify requirements, brainstorm
+risks, or make a consequential choice.
+
+## What comes out
+
+Plain markdown in your repo: committed, reviewed in PRs, and diffed like any
+other source file. Nothing lives only in a chat transcript.
+
+```text
+.clarity-protocol/
+├── summary.md       # what this project is, for a general audience
+├── goal/            # problem, stakeholders, requirements, open questions
+├── solution/        # what you plan to build and how (with threat model)
+├── failures/        # failure modes, chains, management plans
+├── decisions/       # decision log with criteria and rationale
+└── config.json      # dependency graph + content hashes (staleness tracking)
+```
+
+(Plus working files: shared notes, analysis observations, mailboxes holding
+brainstormed failures awaiting review, and an archive kept for provenance.
+See [tests/e2e/fixtures/feature-flags-cli](tests/e2e/fixtures/feature-flags-cli)
+for a complete protocol directory.)
+
+Documents form a dependency graph (problem → stakeholders → requirements →
+solution → failures/architecture). When an upstream document changes, Claudity
+knows what downstream needs revisiting.
 
 ## Cost and privacy
 
 The plugin adds about 800 tokens of always-on context per session. Process
-guides load on demand when a phase starts (roughly 2k to 8k tokens each), and
-the failure-brainstorming thinkers run as subagents, which is the main token
-spend; quick mode keeps them bounded. As a reference point, the
-[example session](EXAMPLE.md) cost about $2.80 on the largest
-model over three substantial turns.
+guides load on demand (roughly 2k to 8k tokens each), and the
+failure-brainstorming thinkers run as subagents, which is the main token
+spend; quick mode keeps them bounded. The [example session](EXAMPLE.md) cost
+about $2.80 on the largest model over three substantial turns.
 
 Everything Claudity produces is plain files in your repo. Your conversation
 goes through Claude Code to Anthropic exactly like any other session; the
@@ -112,33 +108,20 @@ plugin makes no other network calls and collects no telemetry.
 - Per project: delete `.clarity-protocol/` and remove the block between
   `<!-- claudity-begin -->` and `<!-- claudity-end -->` in `CLAUDE.md`
 
-## What comes out
+## About
 
-```text
-.clarity-protocol/
-├── summary.md                  # what this project is, for a general audience
-├── notes.md                    # shared memory: principles, cross-phase observations
-├── observations.md             # patterns and coverage notes from analysis
-├── goal/
-│   ├── problem.md              # what you're trying to achieve and why
-│   ├── stakeholders.md         # who cares about the outcome
-│   ├── requirements.md         # criteria any solution must satisfy
-│   ├── open-questions.md       # unknowns that could change the approach
-│   └── resolved-questions.md   # answered questions, with findings
-├── solution/
-│   ├── solution.md             # what you plan to build
-│   ├── architecture.md         # how you plan to build it (with threat model)
-│   └── solution-summary.md     # concise overview for stakeholders
-├── failures/                   # failure modes, chains, management plans
-├── mailboxes/                  # raw brainstormed failures and suggestions awaiting review
-├── archive/                    # consumed mailbox snapshots, kept for provenance
-├── decisions/                  # decision log with criteria and rationale
-└── config.json                 # dependency graph + content hashes (staleness tracking)
-```
+Claudity is a Claude Code plugin port of Microsoft's
+[Clarity Agent](https://github.com/microsoft/clarity-agent) (MIT), with the
+Python/desktop harness replaced by Claude Code natives: process guides become
+a skill, specialist "thinkers" become subagents, upstream's MCP server runs as
+a vendored zero-dependency server the plugin provides, and staleness tracking
+is a small vendored script.
 
-Documents form a dependency graph (problem → stakeholders → requirements →
-solution → failures/architecture). When an upstream document changes, Claudity
-knows what downstream needs revisiting.
+The port was performed by AI agents (Claude Code) and is covered by a tiered
+automated test harness plus real-session runs; [TESTING.md](TESTING.md)
+documents exactly what is and isn't verified. Claudity is an independent
+project. It is not affiliated with or endorsed by Microsoft or Anthropic. See
+[NOTICE.md](NOTICE.md).
 
 ## Development
 
