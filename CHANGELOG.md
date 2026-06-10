@@ -15,11 +15,11 @@ Tracks microsoft/clarity-agent@6b32c43 (upstream v0.1.2).
 
 - **Raw failures now record to `mailboxes/failure-brainstorm/` and
   suggestions to `mailboxes/suggestions/`** (upstream's on-disk layout),
-  not `failures/pool/` and `notes.md` tags. Packets created by Claudity
-  ≤0.2 need no manual migration: the status engine still counts legacy
-  `failures/pool/*.md` as pending analysis, and failure-analysis sweeps
-  them into its consumption snapshot (PORTING.md R18). New recordings
-  never write to the pool.
+  not `failures/pool/` and `notes.md` tags. 0.3 does not read the legacy
+  pool: if a packet created by Claudity ≤0.2 still has `failures/pool/`
+  items, move each into the mailbox (`python3 <plugin>/scripts/mailbox.py
+  write --name failure-brainstorm --item-name <slug>` with the item text
+  on stdin) or simply re-run failure brainstorming.
 
 ### Added
 
@@ -150,7 +150,7 @@ Tracks microsoft/clarity-agent@6b32c43 (upstream v0.1.2).
     against the guide CLI's `decision-NN-<slug>` ids) and recorded no
     related docs (tool-recorded decisions could never fire
     reconsideration triggers) — fixed by full-stem keys and an optional
-    `related_docs` parameter (R17)
+    `related_docs` parameter
 
 
 

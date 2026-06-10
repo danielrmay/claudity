@@ -1,4 +1,4 @@
-<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/failure-analysis.md — modified per PORTING.md rules R1, R8, R10, R17, R18 -->
+<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/failure-analysis.md — modified per PORTING.md rules R1, R8, R10, R17 -->
 
 # Failure Analysis
 
@@ -46,7 +46,7 @@ If existing failure mode documents already exist in `.clarity-protocol/failures/
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/mailbox.py" snapshot --name failure-brainstorm
 ```
 
-This moves all items from the mailbox into `archive/failure-brainstorm/snapshot-YYYYMMDD-HHMMSS/`, leaving the mailbox empty. Any new brainstorming that happens during analysis goes into the same mailbox, while analysis works from the stable snapshot. (For packets created by Claudity 0.2 or earlier, also treat any `.clarity-protocol/failures/pool/*.md` items as part of the mailbox and move them into the same snapshot directory.)
+This moves all items from the mailbox into `archive/failure-brainstorm/snapshot-YYYYMMDD-HHMMSS/`, leaving the mailbox empty. Any new brainstorming that happens during analysis goes into the same mailbox, while analysis works from the stable snapshot.
 
 **Load context**: Read the problem, stakeholders, solution, architecture, the shared failure reasoning guidelines (`failure-reasoning-guidelines.md`, alongside this guide), and any existing failure mode documents in `.clarity-protocol/failures/`.
 

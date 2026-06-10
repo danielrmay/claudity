@@ -49,7 +49,7 @@ EXPECTED_AGENTS = {
 NON_PROCESS_GUIDES = {"failure-reasoning-guidelines"}
 
 VENDOR_HEADER = "Vendored from microsoft/clarity-agent@6b32c43"
-FORBIDDEN_RESIDUE = ["python -m clarity_agent", "`read_thinker_guide`", "pool_add"]
+FORBIDDEN_RESIDUE = ["python -m clarity_agent", "`read_thinker_guide`", "pool_add", "failures/pool"]
 
 
 def parse_frontmatter(path: Path) -> dict[str, str]:

@@ -48,7 +48,6 @@ ALLOWLIST: list[tuple[str, str]] = [
     ("R1", r"python -m clarity_agent\.protocol\.(packet_status|initialize|mailbox)"),
     ("R1", r"(protocol_status|protocol_init|mailbox)\.py"),
     ("R17", r"record_failure|record_suggestion|record-failure|MCP tool|clarity-agent` server|the mailbox|suggestions mailbox|mailboxes/|failure-brainstorm|brainstorming mailbox|suggestion box"),
-    ("R18", r"failures/pool|Claudity 0\.2 or earlier"),
     ("R9", r"read_thinker_guide|recommend_deeper_analysis|recommend-deeper|read-thinker-guide|thinker subagent|Agent tool|launch.*thinker|Specialist Thinkers"),
     ("R9", r"subagent|orchestrat|in parallel"),
     ("R10", r"clarity-agent|claudity|Claudity|`start` skill|/claudity:"),

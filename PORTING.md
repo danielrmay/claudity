@@ -28,7 +28,6 @@ Each vendored markdown file starts with a header comment:
 | R12 | Instructions specific to the Clarity UI, transcripts, docx/packet export, installer, or per-project MCP configuration (`.vscode/mcp.json`, `clarity embed`) | Deleted or replaced with "the Claudity plugin provides these tools" wording; deletions marked `<!-- deleted per R12: ... -->` |
 | R16 | Vendored units that ARE a Claude Code component: guides/templates with a 1:1 user entry (decision-guidance, failure-brainstorming, message-clarification, the agent snippet) and the six thinkers | Packaged as skills/agents: Claude Code frontmatter, a short task preamble, a `## Metadata` block carrying the upstream frontmatter fields, and (thinkers) the standardized `## Output format` contract replacing upstream's tool instructions (with R9); the vendored methodology text remains governed by the other rules. (R15 is retired — see CHANGELOG.) |
 | R17 | The upstream MCP server (`src/clarity_agent/mcp/server.py`, FastMCP) and tool invocations in guide text (MCP tool references and `python -m clarity_agent.ai_actions.*` CLI blocks) | The vendored stdlib server `scripts/mcp_server.py`, declared in the plugin's `.mcp.json` as the `clarity-agent` server, exposing the same 8 tools. Guide text invokes the tools by their upstream names (`record_failure`, `record_suggestion`, `run_clarity`, …). Server adaptations (each noted in its docstring): FastMCP → hand-rolled stdlib JSON-RPC stdio loop; `CLARITY_PROJECT_DIR` → `CLAUDE_PROJECT_DIR` (compat fallback kept); agent-dir → plugin layout via `CLAUDITY_PLUGIN_ROOT` + a guide map; served guide text gets frontmatter stripped and `${CLAUDE_PLUGIN_ROOT}` substituted; upstream's internal (non-tool) functions and 6 MCP resources descoped; `record_failure`/`record_suggestion` gain an optional `source` parameter so orchestrator-recorded findings keep thinker/human provenance; `record_decision` keys `decisionState` by the decision file's full stem so the tool and the guide CLI never double-record, and gains an optional `related_docs` parameter so tool-recorded decisions stay grounded for reconsideration triggers |
-| R18 | — (Claudity-only migration) | Packets created by Claudity ≤0.2 keep raw failures in `failures/pool/*.md`. The status engine counts them as pending-analysis alongside the mailbox, and failure-analysis sweeps them into the consumption snapshot (one parenthetical in its Step 1). New recordings never write to the pool. |
 
 ### Retired rules
 
@@ -37,8 +36,10 @@ tools: status via script, Read/Write tools plus acceptance-gated `--record`,
 decision/failure/suggestion recording via scripts and notes.md, pool files
 instead of mailboxes) were retired when the vendored MCP server landed —
 upstream's tool references in guide text are now correct as written, give or
-take R17. R13 was folded into R1. The 0.3.0 CHANGELOG entry records the
-reversals and their original rationale.
+take R17. R13 was folded into R1. R18 (a legacy-pool dual-read) existed
+briefly on the 0.3.0 branch and was removed before release — treat the
+number as retired. The 0.3.0 CHANGELOG entry records the reversals and
+their original rationale.
 
 ## Vendored Python and tests
 
@@ -50,9 +51,6 @@ Summary of behavioral deviations:
 - **Async locks ignored.** Claudity thinkers are synchronous subagents, so
   `brainstorm_in_progress` is always false. A lockfile left by a Clarity
   harness does not block brainstorming.
-- **Legacy brainstorm pool (R18).** Pending-analysis items are counted from
-  both `mailboxes/failure-brainstorm/` and the legacy Claudity ≤0.2
-  `failures/pool/*.md`.
 - **Init restores the suggestion box; no AGENTS.md block.** `protocol_init.py`
   creates `mailboxes/` and the permanent suggestions mailbox like upstream;
   the CLAUDE.md snippet is installed by `/claudity:embed` instead of the

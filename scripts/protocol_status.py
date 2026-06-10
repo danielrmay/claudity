@@ -20,9 +20,7 @@ Vendored for Claudity from microsoft/clarity-agent@6b32c43
 Copyright (c) Microsoft Corporation). Modifications per PORTING.md:
 the clarity_agent package imports (app_paths.protocol_dir,
 mailbox.list_nonempty_mailboxes, failure_state.check_failure_state) are
-inlined below so the file runs standalone, and the failure state also
-counts Claudity's synchronous brainstorm pool (failures/pool/*.md) since
-Claudity replaces async mailbox thinkers with parallel subagents.
+inlined below so the file runs standalone.
 """
 
 from __future__ import annotations
@@ -269,10 +267,7 @@ def _list_nonempty_mailboxes(protocol_dir: Path) -> list[dict[str, Any]]:
 
 # Upstream: clarity_agent.protocol.failure_state.check_failure_state.
 # Claudity deviation: thinkers run as synchronous subagents, so there are no
-# async lockfiles to track (brainstorm_in_progress is always False), and the
-# pending-analysis count includes failures/pool/*.md — the directory where
-# Claudity's orchestrator persists subagent brainstorm results — in addition
-# to the upstream failure-brainstorm mailbox (for packets made by Clarity).
+# async lockfiles to track (brainstorm_in_progress is always False).
 _FAILURE_FILE_RE = _re.compile(r"^failure-\d+-.*\.md$")
 _MGMT_HEADER_RE = _re.compile(r"^##\s+Management\s+Plan", _re.MULTILINE)
 _MGMT_PLACEHOLDER_PATTERNS = [
@@ -311,12 +306,6 @@ def _count_pending_brainstorm_items(protocol_dir: Path) -> int:
     mailbox_dir = protocol_dir / "mailboxes" / "failure-brainstorm"
     if mailbox_dir.is_dir() and (mailbox_dir / _MAILBOX_CONFIG_FILENAME).exists():
         count += sum(1 for f in mailbox_dir.iterdir() if _is_item_file(f))
-    pool_dir = protocol_dir / "failures" / "pool"
-    if pool_dir.is_dir():
-        count += sum(
-            1 for f in pool_dir.iterdir()
-            if f.is_file() and f.suffix == ".md"
-        )
     return count
 
 
