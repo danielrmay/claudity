@@ -16,12 +16,13 @@ the contract before editing anything:
   run `python3 scripts/upstream_audit.py` — unexplained changed lines fail CI.
   Vendored headers carry the pin; pin-consistency tests fail until headers,
   upstream.json, and UPSTREAM.md agree.
-- **Zero dependencies**: everything runs on python3 stdlib. Nothing is pip-
-  installed, ever — that includes the MCP server (hand-rolled stdio JSON-RPC,
-  see the "Transport" note in PORTING.md).
-- **All file I/O in scripts/ passes `encoding="utf-8"`** — Windows' locale
-  default corrupts unicode markdown; the windows-latest CI job runs the
-  unicode round-trip tests under that default to enforce it.
+- **Zero dependencies**: python3 stdlib only, nothing pip-installed — including
+  the MCP server (hand-rolled stdio JSON-RPC; "Transport" note in PORTING.md).
+- **Windows portability**: all file I/O passes `encoding="utf-8"` (the locale
+  default corrupts unicode markdown) and path comparisons in tests use
+  `as_posix()`. The windows-latest CI job enforces both under cp1252 — never
+  set PYTHONUTF8 in CI; it masks exactly these bugs. The e2e harness is
+  POSIX-only (its tests skip on win32).
 - **Versioning**: bump `.claude-plugin/plugin.json` and
   `.claude-plugin/marketplace.json` together (test-enforced). Releases via
   `claude plugin tag`.
@@ -31,21 +32,18 @@ the contract before editing anything:
 - Tier 1 (free, run always): `.venv/bin/python -m pytest tests/ -q` plus the
   audit above. Tier 0: `claude plugin validate .`.
 - Tier 2 (paid, local): `tests/e2e/run.sh` — see TESTING.md for model floors
-  and stress mode. Sessions run against a frozen snapshot of the plugin, never
-  this repo, and the suite fails if a session mutates the snapshot — so plugin
-  content edits during a background run are safe, but **don't edit the harness
-  scripts (`tests/e2e/`) mid-run** (run.sh/lib.sh/scenarios execute live from
-  the repo).
-- The manifest tests guard the fixture and showcase packets; if the post-run
-  repo-dirty warning ever fires it means the snapshot indirection leaked —
-  investigate, don't shrug.
+  and stress mode. Sessions run against a frozen, hash-verified snapshot of
+  the plugin, never this repo — plugin-content edits during a background run
+  are safe, but don't edit the harness scripts (`tests/e2e/`) mid-run.
+- If the post-run repo-dirty warning ever fires, the snapshot indirection
+  leaked — investigate, don't shrug.
 - `scripts/mcp_server.py` edits need a session restart (or `/reload-plugins`)
-  to take effect interactively; pytest drives fresh server processes, so tests
-  always see current code.
+  interactively; pytest spawns fresh server processes, so tests always see
+  current code.
 
 ## Behavioral changes need behavioral evidence
 
 Guide/skill text changes that claim to fix model behavior need e2e
-measurement (stress a scenario before and after — see the model-floor notes in
-`tests/e2e/scenarios/*/config.sh` for the precedent). Guide-content
+measurement (stress a scenario before and after — the model-floor notes in
+`tests/e2e/scenarios/*/config.sh` are the precedent). Guide-content
 improvements belong upstream first (CONTRIBUTING.md).
