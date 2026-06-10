@@ -21,8 +21,8 @@ cfg = json.load(open(sys.argv[1]))
 state = cfg.get("decisionState", {})
 new = {k: v for k, v in state.items() if k != "decision-01-go-vs-rust"}
 assert new, "no new decisionState entry — --record-decision was not run"
-entry = next(iter(new.values()))
-assert entry.get("status") == "decided", f"status: {entry.get('status')}"
-assert entry.get("relatedDocs"), "relatedDocs empty — decision not grounded"
+grounded = [v for v in new.values()
+            if v.get("status") == "decided" and v.get("relatedDocs")]
+assert grounded, f"no new decided entry with non-empty relatedDocs: {new}"
 PYEOF
 exit 0

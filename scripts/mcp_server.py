@@ -34,6 +34,10 @@ Copyright (c) Microsoft Corporation). Modifications per PORTING.md (R17):
   orchestrator records on behalf of thinker subagents and human
   contributors, so provenance must travel through the tool call —
   upstream preserved it via per-thinker mailbox writers instead.
+- ``record_decision`` tracks state under the decision file's full stem
+  (``decision-NN-<slug>``) instead of upstream's bare number prefix, so
+  the tool and the decision-guidance CLI step write the same
+  ``decisionState`` key instead of double-recording.
 """
 
 from __future__ import annotations
@@ -399,9 +403,10 @@ def record_decision(
 
     filename, _ = write_decision_file(proto_dir, title, content)
 
-    # Extract the number prefix for config.json tracking.
-    match = re.search(r"decision-(\d+)", filename)
-    decision_id = match.group(1) if match else "01"
+    # Track under the full file stem (upstream extracts only the number
+    # prefix, which diverges from the guide CLI's `decision-XX-name` ids
+    # and double-records when both paths run; R17 deviation).
+    decision_id = Path(filename).stem
 
     try:
         _record_decision(

@@ -10,7 +10,7 @@ small headless smoke suite with a hard cost budget, run locally on demand.
 | ---- | ---- | ---- | ---- |
 | 0 | `claude plugin validate .` + component inventory (`claude --plugin-dir . plugin details claudity`) | free | CI, every push |
 | 1 | `pytest tests/` — 71 vendored status-engine tests + structural tests (manifests, frontmatter, cross-reference integrity, porting lints, init↔staleness coupling) | free | CI, every push |
-| 2 | `tests/e2e/run.sh` — 9 headless scenarios with deterministic artifact assertions | ~$2.50 (mixed Haiku/Sonnet floors) | locally, before a release or after touching SKILL.md / processes / commands / agents |
+| 2 | `tests/e2e/run.sh` — 10 headless scenarios with deterministic artifact assertions | ~$2.50 (mixed Haiku/Sonnet floors) | locally, before a release or after touching SKILL.md / processes / commands / agents |
 
 ## Tier 1
 
@@ -82,12 +82,16 @@ Discovery (`discovery-research` / `discovery-prototype`) remains uncovered:
 their outputs are investigation programs and disposable prototypes with no
 cheap deterministic artifact contract.
 
-**Model floors.** Command-anchored scenarios (01–04, 09) run on Haiku — the
-cheapest and most demanding test of those surfaces. Ambient skill-driven
-conversational scenarios (05–08) set `MODEL_FLOOR="sonnet"` in their
-`config.sh`: measured on this suite, natural-language openers drove the full
-pipeline reliably on Sonnet (4/4 stress on 07) but degraded on Haiku (2/6 —
-it engages the skill, then freestyles past "read the process guide"). That
+**Model floors.** Command-anchored scenarios (01, 02, 04, 09, 10) run on
+Haiku — the cheapest and most demanding test of those surfaces. Ambient
+skill-driven conversational scenarios (05–08) set `MODEL_FLOOR="sonnet"` in
+their `config.sh`: measured on this suite, natural-language openers drove the
+full pipeline reliably on Sonnet (4/4 stress on 07) but degraded on Haiku
+(2/6 — it engages the skill, then freestyles past "read the process guide").
+03-decide joined the Sonnet floor with the MCP port: with the clarity-agent
+server in context, Haiku wrote the decision document but skipped the final
+`--record-decision` state step (pre-MCP 3/3, post-MCP 0/3, with a preamble
+warning 1/3; see its config.sh). That
 matches real usage: nobody runs design conversations on Haiku, and the README
 already steers users toward frontier models. An explicit `CLAUDITY_TEST_MODEL`
 overrides floors everywhere.

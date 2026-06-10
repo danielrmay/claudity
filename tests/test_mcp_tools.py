@@ -225,6 +225,23 @@ class TestRecordDecision:
         assert "Recorded decision" in result
         assert "decisions/" in result
 
+    def test_state_keyed_by_full_stem(self, initialized_project: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Claudity R17 deviation: decisionState key matches the guide CLI's
+        decision-NN-<slug> ids, so tool and CLI never double-record."""
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(initialized_project))
+        from mailbox import protocol_dir
+        from mcp_server import record_decision
+        from protocol_status import load_config
+        record_decision(
+            title="Use SQLite",
+            context="Need storage.",
+            decision="SQLite.",
+            rationale="Single node.",
+        )
+        state = load_config(protocol_dir(initialized_project)).get("decisionState", {})
+        (key,) = state.keys()
+        assert key == "decision-01-use-sqlite", key
+
 
 class TestRecordFailure:
     def test_records_failure(self, initialized_project: Path, monkeypatch: pytest.MonkeyPatch) -> None:
