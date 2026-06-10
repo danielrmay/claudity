@@ -1,5 +1,3 @@
-# Claudity
-
 <p align="center">
   <img src="assets/hero.gif" width="800" alt="A simulated Claude Code session: the user asks for a tool that pulls prod data into dev, Claudity asks what breaks today and whether prod rows contain customer PII, then records anonymization requirements to .clarity-protocol/goal/requirements.md">
 </p>
