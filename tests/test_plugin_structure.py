@@ -214,7 +214,7 @@ class TestPortingInvariants:
 
     def test_vendor_headers_present(self) -> None:
         missing = [
-            str(f.relative_to(REPO)) for f in self.vendored_files()
+            f.relative_to(REPO).as_posix() for f in self.vendored_files()
             if VENDOR_HEADER not in f.read_text(encoding="utf-8")
         ]
         assert not missing, f"vendored files without upstream header: {missing}"
@@ -414,13 +414,13 @@ class TestUpstreamPin:
         # SKILL.md and routing.md are rewrites of the watched upstream router.
         rewrites = {"skills/start/SKILL.md", "skills/start/reference/routing.md"}
         unwatched = [
-            str(p.relative_to(REPO))
+            p.relative_to(REPO).as_posix()
             for p in repo_markdown_files()
             if "clarity-agent@" in p.read_text(encoding="utf-8")
-            and str(p.relative_to(REPO)) not in watched | rewrites | self.HEADER_EXEMPT
+            and p.relative_to(REPO).as_posix() not in watched | rewrites | self.HEADER_EXEMPT
             # examples/ holds rendered artifacts of watched files (e.g. the
             # embedded CLAUDE.md rendered from the snippet), not vendoring units
-            and not str(p.relative_to(REPO)).startswith(("PORTING", "UPSTREAM", "README", "TESTING", "CHANGELOG", "tests/e2e/fixtures/", "examples/"))
+            and not p.relative_to(REPO).as_posix().startswith(("PORTING", "UPSTREAM", "README", "TESTING", "CHANGELOG", "tests/e2e/fixtures/", "examples/"))
         ]
         assert not unwatched, f"files with vendor headers not in upstream.json watch set: {unwatched}"
 
