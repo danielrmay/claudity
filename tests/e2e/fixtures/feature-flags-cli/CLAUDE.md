@@ -5,7 +5,7 @@ schema_version: 1
 protocol_dir_name: .clarity-protocol
 -->
 <!-- Claudity manages this block; edits between the claudity-begin / claudity-end markers will be overwritten when the snippet is refreshed. Put project-specific guidance outside the markers. -->
-<!-- Vendored from microsoft/clarity-agent@6b32c43 src/clarity_agent/setup/snippet.md — modified per PORTING.md rules R10, R12, R16 (plugin provides the MCP server; packet-generator reference trimmed; template inlined in the embed skill) -->
+<!-- Vendored from microsoft/clarity-agent@6b32c43 src/clarity_agent/setup/snippet.md — modified per PORTING.md rules R10, R12, R16, R17 (plugin provides the MCP server; packet-generator reference trimmed; template inlined in the embed skill; the no-freehand guard sentence is retained from Claudity 0.2 — e2e showed ambient sessions freestyle past the guides without it) -->
 
 ## Clarity Protocol
 
@@ -15,7 +15,7 @@ This project uses the Clarity Protocol for structured thinking about consequenti
 
 **Before building — think when it matters.** Two triggers:
 
-1. *The user asks.* When they want to explore what to build, clarify requirements, brainstorm risks, or work through a decision: call the `run_clarity` MCP tool.
+1. *The user asks.* When they want to explore what to build, clarify requirements, brainstorm risks, work through a decision, or create or update any protocol document: call the `run_clarity` MCP tool and follow the process guide it returns. Never work on protocol documents freehand — the guides carry required pipeline steps (mailbox snapshots, recording tools, state tracking) that freestyle edits silently miss.
 
 2. *You recognize an inflection point.* Before making choices that would be expensive to reverse — new services, auth/trust models, data schemas, external integrations, significant API contracts — call `check_decision` with what you plan to do. It returns existing decisions, requirements, and architecture so you can check for conflicts. Don't interrupt for routine implementation. The test: "If this turns out wrong, is it a 5-minute fix or a multi-day rework?" Interrupt for the latter.
 

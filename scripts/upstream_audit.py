@@ -69,7 +69,7 @@ ALLOWLIST: list[tuple[str, str]] = [
     # sections become the standardized structured-output sections.
     ("R9/R16", r"^## (Failures|Suggestions|Specialist recommendations|What to Produce|What Each Failure Record Contains)$"),
     ("R9/R16", r"record a raw failure mode|<what to add or change|^## Output Format$|Every failure must end in actual harm"),
-    ("R17", r"check what you plan to do against the protocol|\{\{PROTOCOL_DIR_NAME\}\}"),
+    ("R17", r"run_clarity|process guide|\{\{PROTOCOL_DIR_NAME\}\}"),
     ("R12", r"dev-tools|Generate threat model artifacts|packet generator"),
     # Structural noise from clean splices: blank lines and bare code fences
     # left by removed command blocks (the commands themselves match R1/R17).
