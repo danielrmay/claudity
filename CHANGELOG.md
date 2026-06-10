@@ -135,6 +135,22 @@ Tracks microsoft/clarity-agent@6b32c43 (upstream v0.1.2).
   nonexistent upstream path (`skills/risks/...` instead of `catalogs/...`),
   so its byte-identical check had been silently skipping on a fetch 404;
   the catalog is now actually verified verbatim
+- Three regressions the first post-flip e2e run surfaced, each measured
+  before fixing:
+  - ambient sessions freestyled past the process guides once the snippet
+    went upstream-verbatim (07-analysis failed on Sonnet) — the 0.2
+    snippet's "never work on protocol documents freehand" guard sentence
+    is retained as a documented R17 adaptation
+  - with the MCP server in context, Haiku skipped the decide guide's
+    `--record-decision` state step (pre-MCP 3/3, post-MCP 0/3) —
+    03-decide joins the Sonnet model floor and the decide preamble states
+    that writing the document does not record state
+  - `record_decision` inherited two upstream tool warts that broke
+    grounding: it keyed `decisionState` by bare number (double-recording
+    against the guide CLI's `decision-NN-<slug>` ids) and recorded no
+    related docs (tool-recorded decisions could never fire
+    reconsideration triggers) — fixed by full-stem keys and an optional
+    `related_docs` parameter (R17)
 
 
 
