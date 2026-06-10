@@ -27,9 +27,6 @@ the upstream pin it tracks).
   and `--stress <scenario> <n>` pass-rate mode; per-scenario model floors
   (ambient conversational scenarios test on Sonnet: measured 4/4 vs 2/6 on
   Haiku, which engages the skill then freestyles past the guide)
-- SessionStart hook injects the resolved plugin root into session context,
-  single-sourcing the CLAUDE_PLUGIN_ROOT substitution rule (the variable is
-  never set in Bash); duplicated notes removed from commands
 - The example packet now includes the embedded CLAUDE.md snippet, as every
   real embedded project has
 
@@ -62,8 +59,9 @@ the upstream pin it tracks).
 - `CLAUDE_PLUGIN_ROOT` is substituted only when skill/command content is
   injected — it is NOT set in the Bash environment, so a model re-typing the
   placeholder from a Read-from-disk guide ran scripts against an empty path
-  (silently, when piped through `tail`). The skill and commands now instruct
-  substituting the resolved plugin root when running guide commands
+  (silently, when piped through `tail`). Surface skills now inject their
+  content with the root pre-resolved, and the router instructs substitution
+  for the on-demand guides
 
 ### Removed
 

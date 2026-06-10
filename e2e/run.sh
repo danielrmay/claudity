@@ -138,4 +138,9 @@ if python3 -c "import sys; sys.exit(0 if $total > $MAX_COST else 1)"; then
   overall=1
 fi
 
+# e2e sessions know the plugin root and can stray into it — flag any drift.
+if [[ -n "$(git -C "$REPO" status --porcelain 2>/dev/null)" ]]; then
+  echo "WARNING: this run left the plugin repo dirty (git -C $REPO status); a session may have strayed into the repo" >&2
+fi
+
 exit "$overall"

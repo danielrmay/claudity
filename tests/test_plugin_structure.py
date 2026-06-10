@@ -257,13 +257,6 @@ class TestProtocolScaffolding:
         assert "<!-- claudity-end -->" in snippet
         assert snippet.count("{{PROTOCOL_DIR_NAME}}") >= 2
 
-    def test_sessionstart_hook(self) -> None:
-        """The hook single-sources the plugin-root fact into session context."""
-        hooks = json.loads((REPO / "hooks" / "hooks.json").read_text())
-        entries = hooks["hooks"]["SessionStart"]
-        commands = [h["command"] for e in entries for h in e["hooks"]]
-        assert any("CLAUDE_PLUGIN_ROOT" in c for c in commands)
-
     def test_snippet_is_portable(self) -> None:
         """The snippet is copied into user projects' CLAUDE.md, where
         ${CLAUDE_PLUGIN_ROOT} is not defined — it must route through the
@@ -277,6 +270,38 @@ class TestProtocolScaffolding:
         cfg = json.loads((pd / "config.json").read_text())
         plugin = json.loads((REPO / ".claude-plugin" / "plugin.json").read_text())
         assert cfg["claudity"]["version"] == plugin["version"]
+
+
+# -----------------------------------------------------------------------
+# Repo hygiene (e2e sessions know the plugin root and can stray into it)
+# -----------------------------------------------------------------------
+
+class TestRepoHygiene:
+    def test_no_packet_at_repo_root(self) -> None:
+        """A stray session once ran protocol_init/decide against the repo
+        itself and the packet got swept into a commit. Never again."""
+        assert not (REPO / ".clarity-protocol").exists()
+        assert not (REPO / "Clarity Protocol").exists()
+
+    def test_example_packet_matches_manifest(self) -> None:
+        """The example packet is a curated frozen snapshot; a stray e2e
+        session once 'analyzed' it in place. Any change must be deliberate
+        (update this manifest when curating)."""
+        root = REPO / "examples" / "feature-flags-cli" / ".clarity-protocol"
+        actual = {str(f.relative_to(root)) for f in root.rglob("*") if f.is_file()}
+        expected = {
+            "config.json", "notes.md", "observations.md", "summary.md",
+            "goal/problem.md", "goal/stakeholders.md", "goal/requirements.md",
+            "goal/open-questions.md", "goal/resolved-questions.md",
+            "solution/solution.md", "solution/architecture.md",
+            "solution/solution-summary.md",
+            "decisions/decisions.md", "decisions/decision-01-go-vs-rust.md",
+            "failures/failures.md", "failures/failure-01-token-replay.md",
+            "failures/pool/archive/2026-06-09/security-thinker--token-replay.md",
+        }
+        assert actual == expected, (
+            f"unexpected: {sorted(actual - expected)}; missing: {sorted(expected - actual)}"
+        )
 
 
 # -----------------------------------------------------------------------

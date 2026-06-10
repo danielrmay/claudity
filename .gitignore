@@ -3,3 +3,6 @@ __pycache__/
 .pytest_cache/
 *.pyc
 .DS_Store
+
+# never commit a packet at the plugin repo root (e2e sessions can stray)
+/.clarity-protocol/
