@@ -1,5 +1,3 @@
-# Claudity
-
 <p align="center">
   <img src="assets/hero.gif" width="800" alt="A simulated Claude Code session: the user asks for a tool that pulls prod data into dev, Claudity asks what breaks today and whether prod rows contain customer PII, then records anonymization requirements to .clarity-protocol/goal/requirements.md">
 </p>
@@ -21,8 +19,7 @@ written to versionable markdown in the repo.
 ```
 
 Requires Claude Code (a recent version with plugin support), `python3` 3.10+
-on PATH (the bundled scripts are stdlib-only, nothing to pip install), and
-`git`. Tested on macOS and Linux.
+on PATH, and `git`. Tested on macOS and Linux.
 
 <details>
 <summary>Windows notes</summary>
@@ -83,7 +80,7 @@ other source file. Nothing lives only in a chat transcript.
 
 (Plus working files: shared notes, analysis observations, mailboxes holding
 brainstormed failures awaiting review, and an archive kept for provenance.
-See [tests/e2e/fixtures/feature-flags-cli](tests/e2e/fixtures/feature-flags-cli)
+See [here](tests/e2e/fixtures/feature-flags-cli)
 for a complete protocol directory.)
 
 Documents form a dependency graph (problem → stakeholders → requirements →
