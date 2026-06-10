@@ -20,7 +20,8 @@ Vendored for Claudity from microsoft/clarity-agent@6b32c43
 Copyright (c) Microsoft Corporation). Modifications per PORTING.md:
 the clarity_agent package imports (app_paths.protocol_dir,
 mailbox.list_nonempty_mailboxes, failure_state.check_failure_state) are
-inlined below so the file runs standalone.
+inlined below so the file runs standalone, and all file I/O passes
+encoding="utf-8" (Windows' locale default corrupts unicode markdown).
 """
 
 from __future__ import annotations
@@ -259,7 +260,7 @@ def _list_nonempty_mailboxes(protocol_dir: Path) -> list[dict[str, Any]]:
             continue
         result.append({
             "name": entry.name,
-            "config": json.loads(config_path.read_text()),
+            "config": json.loads(config_path.read_text(encoding="utf-8")),
             "item_count": len(items),
         })
     return result
@@ -288,7 +289,7 @@ class _FailureState:
 
 
 def _has_management_plan(file_path: Path) -> bool:
-    text = file_path.read_text()
+    text = file_path.read_text(encoding="utf-8")
     match = _MGMT_HEADER_RE.search(text)
     if not match:
         return False
@@ -343,7 +344,7 @@ def is_template(file_path: Path) -> bool:
     try:
         content: str = file_path.read_text(encoding="utf-8").strip()
     except UnicodeDecodeError:
-        content = file_path.read_text().strip()
+        content = file_path.read_text(encoding="utf-8").strip()
     if not content:
         return True
     for marker in TEMPLATE_MARKERS:
@@ -362,7 +363,7 @@ def load_config(protocol_dir: Path) -> ClarityConfig:
     config_path: Path = protocol_dir / "config.json"
     if not config_path.exists():
         return {}
-    with open(config_path) as f:
+    with open(config_path, encoding="utf-8") as f:
         result: ClarityConfig = json.load(f)
         return result
 
@@ -370,7 +371,7 @@ def load_config(protocol_dir: Path) -> ClarityConfig:
 def save_config(protocol_dir: Path, config: ClarityConfig) -> None:
     """Write config.json to the protocol directory, preserving formatting."""
     config_path: Path = protocol_dir / "config.json"
-    with open(config_path, "w") as f:
+    with open(config_path, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=2)
         f.write("\n")
 
@@ -589,7 +590,7 @@ def check_resolved_in_open_questions(protocol_dir: Path) -> list[str]:
     warnings: list[str] = []
     current_question: str | None = None
 
-    for line in oq_path.read_text().splitlines():
+    for line in oq_path.read_text(encoding="utf-8").splitlines():
         heading_match = re.match(r"^##\s+(Q\d+:.+)", line)
         if heading_match:
             current_question = heading_match.group(1).strip()

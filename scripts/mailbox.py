@@ -18,7 +18,9 @@ Vendored for Claudity from microsoft/clarity-agent@6b32c43
 Copyright (c) Microsoft Corporation). Modifications per PORTING.md:
 the clarity_agent.app_paths imports (_PROTOCOL_DIR_DOT,
 _PROTOCOL_DIR_VISIBLE, find_protocol_dir) are inlined below so the file
-runs standalone. Note: this module shadows the stdlib ``mailbox`` module
+runs standalone; all file I/O passes encoding="utf-8" (Windows'
+locale default corrupts unicode markdown). Note: this module shadows
+the stdlib ``mailbox`` module
 for code importing with scripts/ on sys.path; nothing in this repo uses
 the stdlib module.
 """
@@ -220,7 +222,7 @@ class Mailbox:
         """
         if not self.exists:
             raise MailboxNotFoundError(f"Mailbox '{self.name}' does not exist")
-        return json.loads(self.config_path.read_text())
+        return json.loads(self.config_path.read_text(encoding="utf-8"))
 
     def save_config(self, config: dict[str, Any]) -> None:
         """Write config to _config.json in both mailbox and archive.
@@ -230,9 +232,9 @@ class Mailbox:
         if not self.exists:
             raise MailboxNotFoundError(f"Mailbox '{self.name}' does not exist")
         content: str = json.dumps(config, indent=2) + "\n"
-        self.config_path.write_text(content)
+        self.config_path.write_text(content, encoding="utf-8")
         if self.archive_dir.exists():
-            self.archive_config_path.write_text(content)
+            self.archive_config_path.write_text(content, encoding="utf-8")
 
     # --- Factory ---
 
@@ -255,8 +257,8 @@ class Mailbox:
         mailbox.archive_dir.mkdir(parents=True, exist_ok=True)
 
         content: str = json.dumps(config, indent=2) + "\n"
-        mailbox.config_path.write_text(content)
-        mailbox.archive_config_path.write_text(content)
+        mailbox.config_path.write_text(content, encoding="utf-8")
+        mailbox.archive_config_path.write_text(content, encoding="utf-8")
 
         return mailbox
 
@@ -324,7 +326,7 @@ class Mailbox:
         while True:
             path = self.mailbox_dir / f"{now}-{counter:02d}-{name}.md"
             try:
-                with path.open("x") as f:
+                with path.open("x", encoding="utf-8") as f:
                     f.write(content)
                 return path
             except FileExistsError:
@@ -446,7 +448,7 @@ class Mailbox:
             "expires_at": expires_at.isoformat(),
         }
         lock_path: Path = self.mailbox_dir / f"_{thinker_name}{self._LOCK_SUFFIX}"
-        lock_path.write_text(json.dumps(lock_data, indent=2) + "\n")
+        lock_path.write_text(json.dumps(lock_data, indent=2) + "\n", encoding="utf-8")
         return lock_path
 
     def remove_lock(self, thinker_name: str) -> None:
@@ -477,7 +479,7 @@ class Mailbox:
         for path in self.mailbox_dir.iterdir():
             if path.name.startswith("_") and path.name.endswith(self._LOCK_SUFFIX):
                 try:
-                    data: dict[str, Any] = json.loads(path.read_text())
+                    data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
                     created = datetime.fromisoformat(data["created_at"])
                     expires = datetime.fromisoformat(data["expires_at"])
                     if expires > now:
@@ -502,7 +504,7 @@ class Mailbox:
         for path in self.mailbox_dir.iterdir():
             if path.name.startswith("_") and path.name.endswith(self._LOCK_SUFFIX):
                 try:
-                    data = json.loads(path.read_text())
+                    data = json.loads(path.read_text(encoding="utf-8"))
                     expires = datetime.fromisoformat(data["expires_at"])
                     if expires <= now:
                         path.unlink()
@@ -539,7 +541,7 @@ def list_nonempty_mailboxes(protocol_dir: Path) -> list[MailboxInfo]:
         if not items:
             continue
 
-        config: dict[str, Any] = json.loads(config_path.read_text())
+        config: dict[str, Any] = json.loads(config_path.read_text(encoding="utf-8"))
         result.append({
             "name": entry.name,
             "config": config,

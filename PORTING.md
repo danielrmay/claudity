@@ -61,6 +61,14 @@ policy (each is also flagged in the server docstring):
   prefix). Upstream's tool and its own decision-guidance CLI disagree on id
   format; a session that used both double-recorded under `02` and
   `decision-02-<slug>`. The tool now writes the same key the CLI does.
+- **`encoding="utf-8"` on all file I/O** in the vendored protocol scripts
+  (upstream omits it in `mailbox.py`, `packet_status.py`, `initialize.py`):
+  Windows' locale default is cp1252, which corrupts unicode markdown.
+  Locked by a unicode round-trip test that runs on the windows-latest CI job.
+- **`Path.is_relative_to` traversal guards** in the server (upstream uses a
+  string-prefix comparison, which a sibling directory like
+  `.clarity-protocol-evil` passes on any OS, and which case-insensitive
+  filesystems weaken further).
 
 ### Retired rules
 

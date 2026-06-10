@@ -215,6 +215,17 @@ class TestReadWriteProtocolDocument:
         result = read_protocol_document("../../etc/passwd")
         assert "traversal" in result.lower()
 
+    def test_sibling_prefix_directory_blocked(self, initialized_project: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Claudity R17 deviation: is_relative_to guards — a sibling dir whose
+        name extends the protocol dir's defeats a string-prefix check."""
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(initialized_project))
+        from mcp_server import read_protocol_document
+        evil = initialized_project / ".clarity-protocol-evil"
+        evil.mkdir()
+        (evil / "secret.md").write_text("leak", encoding="utf-8")
+        result = read_protocol_document("../.clarity-protocol-evil/secret.md")
+        assert "traversal" in result.lower()
+
     def test_write_auto_records_hashes(self, initialized_project: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         """Writing a protocol document should auto-record its content hash."""
         monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(initialized_project))

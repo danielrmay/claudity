@@ -48,7 +48,13 @@ It is not affiliated with or endorsed by Microsoft or Anthropic. See
 - Claude Code with plugin support (a recent version)
 - `python3` 3.10+ on PATH (the bundled scripts are stdlib-only)
 - `git` (the protocol directory is designed to be committed)
-- Tested on macOS and Linux; Windows is untested
+- Tested on macOS and Linux. On Windows: the Python layer (including the
+  bundled MCP server) is CI-verified on `windows-latest`, but Claude Code
+  itself running the plugin natively on Windows has not been validated.
+  Two known requirements: Claude Code's Bash tool needs Git for Windows,
+  and the plugin invokes `python3` — the python.org installer registers
+  `python`/`py` but not `python3` (the Microsoft Store build does; or
+  create an alias/shim so `python3` resolves)
 
 ## Install
 

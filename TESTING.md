@@ -73,6 +73,15 @@ suite fails if a sequential run's total exceeds the budget.
 | 09-message | message-clarification writes a non-template general-audience `summary.md` and records it |
 | 10-record | the headless MCP canary: an ambient risk report lands as exactly one `mailboxes/failure-brainstorm/` item via the `record_failure` tool |
 
+**Windows.** Tier 1 runs on both `ubuntu-latest` and `windows-latest` in
+CI — the Windows job is the empirical compatibility evidence for the Python
+layer (the MCP protocol tests spawn the real server, and the unicode
+round-trip tests run under Windows' cp1252 locale default — never set
+PYTHONUTF8 in CI, it would mask the bugs they guard against). The e2e harness
+(`tests/e2e/`) is POSIX-only by design (bash, rsync, shasum); its tests skip
+on win32. Claude Code natively running the plugin on Windows remains
+unvalidated — see the README prerequisites.
+
 **Plugin isolation.** Sessions never see the real repo: each suite run
 snapshots the plugin payload (working tree minus `.git`/`.venv`/caches) to
 `/tmp/claudity-e2e-plugin.*` and every `claude` invocation gets the snapshot

@@ -11,7 +11,8 @@ the protocol-dir resolution is inlined so the file runs standalone;
 the AGENTS.md snippet refresh is removed (Claudity installs its snippet
 into CLAUDE.md via the embed command); ensure_suggestion_box imports
 from the sibling mailbox module; the default config identifies Claudity
-instead of a clarity-agent install.
+instead of a clarity-agent install; all file I/O passes encoding="utf-8"
+(Windows' locale default corrupts unicode markdown).
 
 Template contents are verbatim from upstream — their placeholder text
 must keep matching TEMPLATE_MARKERS in protocol_status.py, which is how
@@ -56,7 +57,7 @@ def _claudity_version() -> str:
     """Read the plugin version (single-sourced from plugin.json)."""
     manifest = Path(__file__).resolve().parent.parent / ".claude-plugin" / "plugin.json"
     try:
-        return str(json.loads(manifest.read_text())["version"])
+        return str(json.loads(manifest.read_text(encoding="utf-8"))["version"])
     except (OSError, ValueError, KeyError):
         return "unknown"
 
