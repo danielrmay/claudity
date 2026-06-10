@@ -26,6 +26,13 @@ Copyright (c) Microsoft Corporation). Modifications per PORTING.md (R17):
   (protocol_status, brainstorm, suggestion, mailbox).
 - Upstream's internal (non-tool) functions are descoped (no Claude Code
   consumer).
+- The six MCP resources are served (``resources/list``,
+  ``resources/templates/list``, ``resources/read``) so they stay
+  @-mentionable in Claude Code. ``clarity://behaviors`` reads the
+  claudity-begin/end block from the project's CLAUDE.md (upstream reads
+  AGENTS.md and refreshes it via ``ensure_for_project``; resource reads
+  here are side-effect-free). ``clarity://thinkers/{name}`` serves
+  ``agents/<name>.md`` with the Claude Code frontmatter stripped.
 
 Extensions beyond upstream's tool surface — protocol improvements, not
 porting substitutions; upstream proposal candidates (PORTING.md "Server
@@ -485,6 +492,159 @@ def record_suggestion(
 
 
 # ===================================================================
+# MCP RESOURCES
+# ===================================================================
+
+_CLAUDITY_BLOCK_RE = re.compile(
+    r"<!-- claudity-begin -->.*?<!-- claudity-end -->", re.DOTALL
+)
+
+
+def project_summary() -> str:
+    """Read the project summary from .clarity-protocol/summary.md."""
+    proto_dir = _resolve_protocol_dir()
+    summary_path = proto_dir / "summary.md"
+    if not summary_path.exists():
+        return "No project summary found."
+    return summary_path.read_text(encoding="utf-8")
+
+
+def decisions_resource() -> str:
+    """Read all project decision records concatenated into one document."""
+    proto_dir = _resolve_protocol_dir()
+    decisions_dir = proto_dir / "decisions"
+    if not decisions_dir.exists():
+        return "No decisions directory found."
+
+    parts: list[str] = []
+    for df in sorted(decisions_dir.glob("decision-*.md")):
+        parts.append(df.read_text(encoding="utf-8"))
+
+    if not parts:
+        return "No decision records found."
+    return "\n\n---\n\n".join(parts)
+
+
+def behaviors_resource() -> str:
+    """Read the cross-cutting behavioral guidelines.
+
+    Claudity reads the ``<!-- claudity-begin -->`` block from the
+    project's CLAUDE.md (installed by /claudity:embed). Upstream reads
+    the clarity block from AGENTS.md and refreshes it first via
+    ``ensure_for_project``; resource reads here are side-effect-free.
+    """
+    claude_md = _resolve_project_dir() / "CLAUDE.md"
+    if not claude_md.exists():
+        return (
+            "CLAUDE.md not found in this project. Run /claudity:embed "
+            "to create it."
+        )
+    match = _CLAUDITY_BLOCK_RE.search(claude_md.read_text(encoding="utf-8"))
+    if match is None:
+        return (
+            "CLAUDE.md exists but has no Claudity block (no "
+            "<!-- claudity-begin --> / <!-- claudity-end --> markers). "
+            "Re-run /claudity:embed to refresh it."
+        )
+    return match.group(0)
+
+
+def process_guide_resource(name: str) -> str:
+    """Read a process guide by name."""
+    text = _guide_text(name)
+    if text is None:
+        return f"Process guide not found: {name}"
+    return text
+
+
+def thinker_guide_resource(name: str) -> str:
+    """Read a thinker guide by name.
+
+    Served from the plugin's agents/ directory with the Claude Code
+    frontmatter stripped (R16 packaging, not methodology).
+    """
+    guide_path = _resolve_agent_dir() / "agents" / f"{name}.md"
+    if not guide_path.exists():
+        return f"Thinker guide not found: {name}"
+    return _FRONTMATTER_RE.sub("", guide_path.read_text(encoding="utf-8"), count=1)
+
+
+def protocol_document_resource(path: str) -> str:
+    """Read any protocol document by path.
+
+    Use forward slashes for nested paths (e.g., 'goal/problem.md').
+    """
+    proto_dir = _resolve_protocol_dir()
+    file_path = (proto_dir / path).resolve()
+    if not str(file_path).startswith(str(proto_dir.resolve())):
+        return "Error: path traversal not allowed."
+    if not file_path.exists():
+        return f"Document not found: {path}"
+    return file_path.read_text(encoding="utf-8")
+
+
+RESOURCES: list[dict] = [
+    {
+        "uri": "clarity://summary",
+        "name": "project_summary",
+        "description": "The project summary (.clarity-protocol/summary.md).",
+        "fn": project_summary,
+    },
+    {
+        "uri": "clarity://decisions",
+        "name": "decisions_resource",
+        "description": "All project decision records, concatenated.",
+        "fn": decisions_resource,
+    },
+    {
+        "uri": "clarity://behaviors",
+        "name": "behaviors_resource",
+        "description": "The cross-cutting behavioral guidelines (the Claudity block in CLAUDE.md).",
+        "fn": behaviors_resource,
+    },
+]
+
+RESOURCE_TEMPLATES: list[dict] = [
+    {
+        "uriTemplate": "clarity://processes/{name}",
+        "name": "process_guide_resource",
+        "description": "A clarity process guide by name (e.g. failure-analysis).",
+        "prefix": "clarity://processes/",
+        "fn": process_guide_resource,
+    },
+    {
+        "uriTemplate": "clarity://thinkers/{name}",
+        "name": "thinker_guide_resource",
+        "description": "A specialist thinker's methodology guide by name.",
+        "prefix": "clarity://thinkers/",
+        "fn": thinker_guide_resource,
+    },
+    {
+        "uriTemplate": "clarity://protocol/{path}",
+        "name": "protocol_document_resource",
+        "description": "Any protocol document by path (e.g. goal/problem.md).",
+        "prefix": "clarity://protocol/",
+        "fn": protocol_document_resource,
+    },
+]
+
+_RESOURCE_INDEX = {r["uri"]: r for r in RESOURCES}
+
+
+def _read_resource(uri: str) -> str | None:
+    """Resolve a resource URI to its text, or None if no route matches."""
+    concrete = _RESOURCE_INDEX.get(uri)
+    if concrete is not None:
+        return concrete["fn"]()
+    for template in RESOURCE_TEMPLATES:
+        if uri.startswith(template["prefix"]):
+            arg = uri[len(template["prefix"]):]
+            if arg:
+                return template["fn"](arg)
+    return None
+
+
+# ===================================================================
 # Stdlib MCP stdio transport (replaces FastMCP per PORTING.md R17)
 # ===================================================================
 
@@ -689,7 +849,7 @@ def _handle(req: dict) -> dict | None:
         version = client_version if client_version in SUPPORTED_PROTOCOL_VERSIONS else "2025-06-18"
         return _rpc_result(req_id, {
             "protocolVersion": version,
-            "capabilities": {"tools": {}},
+            "capabilities": {"tools": {}, "resources": {}},
             "serverInfo": {"name": SERVER_NAME, "version": _server_version()},
             "instructions": SERVER_INSTRUCTIONS,
         })
@@ -699,8 +859,29 @@ def _handle(req: dict) -> dict | None:
         return _rpc_result(req_id, {"tools": _tool_listing()})
     if method == "tools/call":
         return _handle_tools_call(req_id, params)
-    if method == "resources/list":  # capability not declared; answer defensively
-        return _rpc_result(req_id, {"resources": []})
+    if method == "resources/list":
+        return _rpc_result(req_id, {"resources": [
+            {"uri": r["uri"], "name": r["name"], "description": r["description"],
+             "mimeType": "text/markdown"}
+            for r in RESOURCES
+        ]})
+    if method == "resources/templates/list":
+        return _rpc_result(req_id, {"resourceTemplates": [
+            {"uriTemplate": t["uriTemplate"], "name": t["name"],
+             "description": t["description"], "mimeType": "text/markdown"}
+            for t in RESOURCE_TEMPLATES
+        ]})
+    if method == "resources/read":
+        uri = params.get("uri", "")
+        try:
+            text = _read_resource(uri)
+        except Exception as exc:  # noqa: BLE001 — surface as protocol error
+            return _rpc_error(req_id, -32603, f"Resource read failed: {exc}")
+        if text is None:
+            return _rpc_error(req_id, -32002, f"Resource not found: {uri}")
+        return _rpc_result(req_id, {"contents": [
+            {"uri": uri, "mimeType": "text/markdown", "text": text}
+        ]})
     return _rpc_error(req_id, -32601, f"Method not found: {method}")
 
 

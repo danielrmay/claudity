@@ -7,9 +7,9 @@ Vendored for Claudity from microsoft/clarity-agent@6b32c43
 (tests/test_mcp_server.py, MIT License, Copyright (c) Microsoft
 Corporation). Modifications per PORTING.md (R17): package imports become
 sibling-module imports; CLARITY_PROJECT_DIR becomes CLAUDE_PROJECT_DIR;
-registration tests inspect the stdlib server's TOOLS table instead of
-FastMCP managers; tests of the descoped internal functions and MCP
-resources are removed.
+registration tests inspect the stdlib server's TOOLS/RESOURCES tables
+instead of FastMCP managers; tests of the descoped internal functions
+are removed.
 """
 
 from __future__ import annotations
@@ -94,6 +94,21 @@ def test_no_internal_tools_exposed() -> None:
     }
     leaked = internal & tool_names
     assert not leaked, f"Internal functions leaked as MCP tools: {leaked}"
+
+
+def test_resources_registered() -> None:
+    """Direct resources and templates should be registered."""
+    from mcp_server import RESOURCE_TEMPLATES, RESOURCES
+
+    resource_names = {r["name"] for r in RESOURCES}
+    assert "project_summary" in resource_names
+    assert "decisions_resource" in resource_names
+    assert "behaviors_resource" in resource_names
+
+    template_names = {t["name"] for t in RESOURCE_TEMPLATES}
+    assert "process_guide_resource" in template_names
+    assert "thinker_guide_resource" in template_names
+    assert "protocol_document_resource" in template_names
 
 
 # ---------------------------------------------------------------------------

@@ -193,6 +193,73 @@ class TestToolsCall:
         assert resp["error"]["code"] == -32602
 
 
+class TestResources:
+    def _req(self, req_id: int, method: str, params: dict | None = None) -> dict:
+        req = {"jsonrpc": "2.0", "id": req_id, "method": method}
+        if params is not None:
+            req["params"] = params
+        return req
+
+    def test_capability_declared(self, project: Path) -> None:
+        (resp,) = handshake(project_dir=project)
+        assert "resources" in resp["result"]["capabilities"]
+
+    def test_lists_three_concrete_resources(self, project: Path) -> None:
+        responses = handshake(self._req(2, "resources/list"), project_dir=project)
+        uris = {r["uri"] for r in responses[-1]["result"]["resources"]}
+        assert uris == {"clarity://summary", "clarity://decisions", "clarity://behaviors"}
+
+    def test_lists_three_templates(self, project: Path) -> None:
+        responses = handshake(self._req(2, "resources/templates/list"), project_dir=project)
+        templates = {t["uriTemplate"] for t in responses[-1]["result"]["resourceTemplates"]}
+        assert templates == {
+            "clarity://processes/{name}",
+            "clarity://thinkers/{name}",
+            "clarity://protocol/{path}",
+        }
+
+    def test_read_concrete_resource(self, project: Path) -> None:
+        responses = handshake(
+            self._req(2, "resources/read", {"uri": "clarity://summary"}),
+            project_dir=project,
+        )
+        (content,) = responses[-1]["result"]["contents"]
+        assert content["uri"] == "clarity://summary"
+        assert content["mimeType"] == "text/markdown"
+        assert content["text"].strip()
+
+    def test_read_templated_protocol_document(self, project: Path) -> None:
+        (project / ".clarity-protocol" / "goal" / "problem.md").write_text("# P\n\nReal.\n")
+        responses = handshake(
+            self._req(2, "resources/read", {"uri": "clarity://protocol/goal/problem.md"}),
+            project_dir=project,
+        )
+        assert "Real." in responses[-1]["result"]["contents"][0]["text"]
+
+    def test_read_templated_process_guide(self, project: Path) -> None:
+        responses = handshake(
+            self._req(2, "resources/read", {"uri": "clarity://processes/failure-analysis"}),
+            project_dir=project,
+        )
+        text = responses[-1]["result"]["contents"][0]["text"]
+        assert "# Failure Analysis" in text
+        assert "${CLAUDE_PLUGIN_ROOT}" not in text  # placeholder substituted
+
+    def test_traversal_guard(self, project: Path) -> None:
+        responses = handshake(
+            self._req(2, "resources/read", {"uri": "clarity://protocol/../../etc/passwd"}),
+            project_dir=project,
+        )
+        assert "traversal" in responses[-1]["result"]["contents"][0]["text"].lower()
+
+    def test_unknown_uri_is_resource_not_found(self, project: Path) -> None:
+        responses = handshake(
+            self._req(2, "resources/read", {"uri": "clarity://nope"}),
+            project_dir=project,
+        )
+        assert responses[-1]["error"]["code"] == -32002
+
+
 class TestProtocolErrors:
     def test_unknown_method(self, project: Path) -> None:
         req = {"jsonrpc": "2.0", "id": 2, "method": "prompts/list"}
