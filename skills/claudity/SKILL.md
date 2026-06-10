@@ -75,6 +75,7 @@ Once you know what to work on:
 
 1. Tell the user what you suggest and why.
 2. Read the process guide from `${CLAUDE_PLUGIN_ROOT}/skills/claudity/processes/<name>.md` and follow it from its beginning. Process guides contain specific steps and pipelines that must be followed — don't attempt the task freehand. Re-read a guide only when switching processes, not on every turn.
+3. The guides reference plugin scripts via a `CLAUDE_PLUGIN_ROOT` placeholder. That variable is **not set in the Bash environment** — when running a guide's commands, substitute the plugin root's absolute path yourself (it is the prefix of the guide's own file path, before `skills/claudity/`). Never run a command containing the unexpanded placeholder, and never pipe these commands through `tail`/`head` in a way that hides their errors.
 
 **After any process completes, return here**: re-run the status script, see what changed, and guide the user to the next useful thing. Never leave them in silence wondering what happens next.
 

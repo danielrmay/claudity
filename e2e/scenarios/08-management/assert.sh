@@ -24,5 +24,10 @@ import json, sys
 report = json.load(sys.stdin)
 phases = {p["process"]: p["status"] for p in report["processAvailability"]}
 assert phases.get("failure-management") != "recommended", phases
-' || { fail "status still recommends failure-management"; exit 1; }
+# Recording must have happened via the status script: failures.md tracked
+# (current or stale), never untracked. Two pre-fix sessions hand-invented
+# config bookkeeping and this assert would have caught them.
+status = report["documents"]["failures/failures.md"]["status"]
+assert status in ("current", "stale"), f"failures.md status: {status} (not recorded?)"
+' || { fail "status still recommends failure-management, or failures.md not recorded"; exit 1; }
 exit 0

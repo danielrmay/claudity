@@ -21,6 +21,21 @@ the upstream pin it tracks).
   harness showed models repeatedly misplacing hand-written pool files —
   re-learning upstream's reason for making `record_failure` a tool
 
+### Changed
+
+- All e2e scenario prompts enter through real product surfaces (the claudity
+  skill or a command) after transcript forensics showed every
+  bookkeeping-inventing session had simply failed to find the guide;
+  08-management's assert now also verifies state was recorded via the script
+
+### Fixed
+
+- `CLAUDE_PLUGIN_ROOT` is substituted only when skill/command content is
+  injected — it is NOT set in the Bash environment, so a model re-typing the
+  placeholder from a Read-from-disk guide ran scripts against an empty path
+  (silently, when piped through `tail`). The skill and commands now instruct
+  substituting the resolved plugin root when running guide commands
+
 ### Removed
 
 - The experimental README warning, following the isolated real-session

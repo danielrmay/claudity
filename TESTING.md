@@ -40,9 +40,15 @@ on **artifacts** — files created, `config.json` state, status-script output �
 never on LLM-judged transcripts. Scenario prompts must enter through real
 product surfaces (a `/claudity:*` command or the skill): a prompt that says
 "read the guide" without a path tests a phantom entry that no user docs
-suggest, and the model may never find the guide (this exact failure produced
-04-thinker's flakiness before it was switched to `/claudity:risks`). A per-scenario cost table is printed from the
-CLI's `total_cost_usd`, and the suite fails if the total exceeds the budget.
+suggest, and the model may never find the guide. Transcript forensics across
+five sessions showed this cleanly — every session that hand-invented config
+bookkeeping had failed to find the guide, and every session that read the
+guide recorded state correctly. Worse, a model that can't find the guide
+improvises something plausible instead of stopping, which can slip past
+asserts that don't check recording (08-management did exactly this twice
+before its assert was tightened). A per-scenario cost table is printed from
+the CLI's `total_cost_usd`, and the suite fails if the total exceeds the
+budget.
 
 | Scenario | Verifies |
 | -------- | -------- |
