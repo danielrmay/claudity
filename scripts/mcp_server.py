@@ -50,6 +50,10 @@ extensions"):
   (``decision-NN-<slug>``) instead of upstream's bare number prefix, so
   the tool and the decision-guidance CLI step write the same
   ``decisionState`` key instead of double-recording.
+- The path-traversal guards use ``Path.is_relative_to`` instead of
+  upstream's string-prefix comparison, which a sibling directory like
+  ``.clarity-protocol-evil`` passes on any OS and case-insensitive
+  filesystems weaken further.
 """
 
 from __future__ import annotations
@@ -338,7 +342,7 @@ def read_protocol_document(
     proto_dir = _resolve_protocol_dir(project_dir)
     file_path = (proto_dir / document_path).resolve()
 
-    if not str(file_path).startswith(str(proto_dir.resolve())):
+    if not file_path.is_relative_to(proto_dir.resolve()):
         return "Error: path traversal not allowed."
     if not file_path.exists():
         return f"Error: document not found: {document_path}"
@@ -359,7 +363,7 @@ def write_protocol_document(
     proto_dir = _resolve_protocol_dir(project_dir)
     file_path = (proto_dir / document_path).resolve()
 
-    if not str(file_path).startswith(str(proto_dir.resolve())):
+    if not file_path.is_relative_to(proto_dir.resolve()):
         return "Error: path traversal not allowed."
 
     file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -576,7 +580,7 @@ def protocol_document_resource(path: str) -> str:
     """
     proto_dir = _resolve_protocol_dir()
     file_path = (proto_dir / path).resolve()
-    if not str(file_path).startswith(str(proto_dir.resolve())):
+    if not file_path.is_relative_to(proto_dir.resolve()):
         return "Error: path traversal not allowed."
     if not file_path.exists():
         return f"Document not found: {path}"

@@ -12,9 +12,15 @@ snapshot instead of creating their own.
 from __future__ import annotations
 
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
+
+pytestmark = pytest.mark.skipif(
+    sys.platform == "win32",
+    reason="the e2e harness is POSIX-only (bash, rsync, shasum); see TESTING.md",
+)
 
 REPO = Path(__file__).resolve().parent.parent
 LIB = REPO / "tests" / "e2e" / "lib.sh"

@@ -19,6 +19,9 @@ the contract before editing anything:
 - **Zero dependencies**: everything runs on python3 stdlib. Nothing is pip-
   installed, ever — that includes the MCP server (hand-rolled stdio JSON-RPC,
   see the "Transport" note in PORTING.md).
+- **All file I/O in scripts/ passes `encoding="utf-8"`** — Windows' locale
+  default corrupts unicode markdown; the windows-latest CI job runs the
+  unicode round-trip tests under that default to enforce it.
 - **Versioning**: bump `.claude-plugin/plugin.json` and
   `.claude-plugin/marketplace.json` together (test-enforced). Releases via
   `claude plugin tag`.

@@ -27,7 +27,7 @@ import urllib.request
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-CFG = json.loads((REPO / "upstream.json").read_text())
+CFG = json.loads((REPO / "upstream.json").read_text(encoding="utf-8"))
 PIN = CFG["pin"]
 CACHE = Path(f"/tmp/claudity-upstream-pin-{PIN[:12]}")
 RAW = f"https://raw.githubusercontent.com/{CFG['repo']}/{PIN}"
@@ -80,7 +80,7 @@ ALLOWLIST: list[tuple[str, str]] = [
 def fetch(upstream_path: str, offline: bool) -> str | None:
     dst = CACHE / upstream_path
     if dst.exists():
-        return dst.read_text()
+        return dst.read_text(encoding="utf-8")
     if offline:
         return None
     dst.parent.mkdir(parents=True, exist_ok=True)
@@ -90,7 +90,7 @@ def fetch(upstream_path: str, offline: bool) -> str | None:
     except Exception as e:  # noqa: BLE001
         print(f"FETCH ERROR {upstream_path}: {e}", file=sys.stderr)
         return None
-    dst.write_text(text)
+    dst.write_text(text, encoding="utf-8")
     return text
 
 
@@ -148,32 +148,32 @@ def main() -> None:
 
         if entry.get("fidelity") == "inlined":
             short = PIN[:7]
-            ok = local_path.exists() and f"clarity-agent@{short}" in local_path.read_text()
+            ok = local_path.exists() and f"clarity-agent@{short}" in local_path.read_text(encoding="utf-8")
             print(f"  {'✓' if ok else '✗'}  {local}  (inlines {up}; {'pin header present' if ok else 'MISSING pin header'})")
             failures += 0 if ok else 1
             continue
 
         if entry.get("fidelity") == "adapted":
             n = len([l for l in difflib.unified_diff(
-                upstream_text.splitlines(), local_path.read_text().splitlines(), lineterm="")
+                upstream_text.splitlines(), local_path.read_text(encoding="utf-8").splitlines(), lineterm="")
                 if l.startswith(("+", "-")) and not l.startswith(("+++", "---"))])
             print(f"  i  {local}  (adapted — {n} changed lines; contract is its header note + UPSTREAM.md row)")
             continue
 
         if local in QUOTED:
-            ok = upstream_text.strip() in local_path.read_text()
+            ok = upstream_text.strip() in local_path.read_text(encoding="utf-8")
             print(f"  {'✓' if ok else '✗'}  {local}  (license quoted {'intact' if ok else 'MISSING'})")
             failures += 0 if ok else 1
             continue
 
         if local.endswith(INFORMATIONAL_SUFFIXES):
             n = len([l for l in difflib.unified_diff(
-                upstream_text.splitlines(), local_path.read_text().splitlines(), lineterm="")
+                upstream_text.splitlines(), local_path.read_text(encoding="utf-8").splitlines(), lineterm="")
                 if l.startswith(("+", "-")) and not l.startswith(("+++", "---"))])
             print(f"  i  {local}  ({n} changed lines; documented in its docstring)")
             continue
 
-        local_text = local_path.read_text()
+        local_text = local_path.read_text(encoding="utf-8")
         if local in VERBATIM:
             ok = local_text == upstream_text
             print(f"  {'✓' if ok else '✗'}  {local}  ({'byte-identical' if ok else 'DIVERGED — must be verbatim'})")
