@@ -17,6 +17,27 @@ set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$HERE/lib.sh"
 
+# Sessions run against a frozen snapshot of the plugin, never the repo
+# (created once per suite; fanout children inherit it). The creator verifies
+# snapshot integrity at exit — any session write into the plugin fails the run.
+ensure_plugin_snapshot
+REPO_STATUS_BEFORE="$(git -C "$REPO" status --porcelain 2>/dev/null)"
+
+# finish <rc> — integrity-check and clean up the snapshot, then exit.
+finish() {
+  local rc="$1"
+  if ! verify_plugin_snapshot; then
+    rc=1
+  fi
+  overall="$rc"  # keep the EXIT-trap cleanup in sync (retains artifacts on failure)
+  if [[ "$rc" == "0" && "${CLAUDITY_E2E_KEEP:-0}" != "1" ]]; then
+    remove_plugin_snapshot
+  elif [[ "${PLUGIN_SNAPSHOT_OWNED:-0}" == "1" ]]; then
+    echo "kept plugin snapshot: $PLUGIN_DIR"
+  fi
+  exit "$rc"
+}
+
 # Fan-out helpers: scenarios use isolated scratch projects, so concurrent
 # runs are safe. Each job is a child invocation of this script.
 fanout() {  # fanout <label:args>... — runs each as a parallel child, reports
@@ -45,7 +66,7 @@ if [[ "${1:-}" == "--stress" ]]; then
   SCEN="${2:?--stress needs a scenario prefix}"; N="${3:-5}"
   jobs=(); for i in $(seq 1 "$N"); do jobs+=("$SCEN#$i:$SCEN"); done
   echo "stress: $N parallel runs of $SCEN (model: $MODEL)"
-  fanout "${jobs[@]}"; exit $?
+  fanout "${jobs[@]}"; finish $?
 fi
 
 if [[ "${1:-}" == "--parallel" ]]; then
@@ -56,7 +77,7 @@ if [[ "${1:-}" == "--parallel" ]]; then
     jobs+=("$name:$name")
   done
   echo "parallel suite: ${#jobs[@]} scenarios (model: $MODEL)"
-  fanout "${jobs[@]}"; exit $?
+  fanout "${jobs[@]}"; finish $?
 fi
 
 FILTER="${1:-}"
@@ -138,9 +159,12 @@ if python3 -c "import sys; sys.exit(0 if $total > $MAX_COST else 1)"; then
   overall=1
 fi
 
-# e2e sessions know the plugin root and can stray into it — flag any drift.
-if [[ -n "$(git -C "$REPO" status --porcelain 2>/dev/null)" ]]; then
-  echo "WARNING: this run left the plugin repo dirty (git -C $REPO status); a session may have strayed into the repo" >&2
+# Defense in depth: sessions only ever see the snapshot, so the real repo
+# should be untouched — flag any NEW drift (relative to suite start, so
+# developer work-in-progress doesn't false-positive). Drift here would
+# indicate the snapshot indirection leaked.
+if [[ "$(git -C "$REPO" status --porcelain 2>/dev/null)" != "$REPO_STATUS_BEFORE" ]]; then
+  echo "WARNING: the repo's git status changed during this run; a session may have strayed into the repo" >&2
 fi
 
-exit "$overall"
+finish "$overall"

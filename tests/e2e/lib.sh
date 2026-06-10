@@ -6,6 +6,62 @@ REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 MODEL="${CLAUDITY_TEST_MODEL:-haiku}"
 ART_DIR="${CLAUDITY_E2E_ART_DIR:-$(mktemp -d /tmp/claudity-e2e-art.XXXXXX)}"
 
+# --- Plugin isolation -------------------------------------------------------
+# Sessions never see the real repo: each suite run snapshots the plugin
+# payload (working tree minus .git/.venv/caches) and every claude invocation
+# gets the snapshot as --plugin-dir. A sha256 manifest taken at snapshot time
+# lets the suite prove afterward that no session mutated the plugin
+# (verify_plugin_snapshot). Fanout children inherit the parent's snapshot via
+# CLAUDITY_E2E_PLUGIN_DIR; only the creator verifies and removes it.
+
+# ensure_plugin_snapshot — create (or adopt) the snapshot; sets PLUGIN_DIR,
+# PLUGIN_MANIFEST, and PLUGIN_SNAPSHOT_OWNED ("1" only in the creator).
+ensure_plugin_snapshot() {
+  if [[ -n "${CLAUDITY_E2E_PLUGIN_DIR:-}" ]]; then
+    PLUGIN_DIR="$CLAUDITY_E2E_PLUGIN_DIR"
+    PLUGIN_MANIFEST="$PLUGIN_DIR.manifest"
+    PLUGIN_SNAPSHOT_OWNED=0
+    return 0
+  fi
+  PLUGIN_DIR=$(mktemp -d /tmp/claudity-e2e-plugin.XXXXXX)
+  rsync -a \
+    --exclude '.git' --exclude '.venv' \
+    --exclude '__pycache__' --exclude '.pytest_cache' \
+    "$REPO/" "$PLUGIN_DIR/"
+  PLUGIN_MANIFEST="$PLUGIN_DIR.manifest"
+  _plugin_checksums "$PLUGIN_DIR" > "$PLUGIN_MANIFEST"
+  PLUGIN_SNAPSHOT_OWNED=1
+  export CLAUDITY_E2E_PLUGIN_DIR="$PLUGIN_DIR"
+}
+
+_plugin_checksums() {  # <dir> — stable sha256 list, paths relative to <dir>
+  # __pycache__ is excluded: the vendored scripts import each other, so the
+  # interpreter writes .pyc files into the snapshot at runtime — interpreter
+  # byproduct, not a session mutation.
+  (cd "$1" && find . -type f -not -path '*/__pycache__/*' -print0 | sort -z | xargs -0 shasum -a 256)
+}
+
+# verify_plugin_snapshot — 0 if the snapshot is byte-identical to launch
+# state; otherwise prints the drifted paths and returns 1.
+verify_plugin_snapshot() {
+  [[ "${PLUGIN_SNAPSHOT_OWNED:-0}" == "1" ]] || return 0
+  local current
+  current=$(mktemp)
+  _plugin_checksums "$PLUGIN_DIR" > "$current"
+  if ! diff -q "$PLUGIN_MANIFEST" "$current" >/dev/null; then
+    echo "PLUGIN SNAPSHOT MUTATED — a session wrote into the plugin dir:" >&2
+    diff "$PLUGIN_MANIFEST" "$current" | grep '^[<>]' | awk '{print "  " $1 " " $3}' | sort -u >&2
+    rm -f "$current"
+    return 1
+  fi
+  rm -f "$current"
+}
+
+remove_plugin_snapshot() {
+  [[ "${PLUGIN_SNAPSHOT_OWNED:-0}" == "1" ]] || return 0
+  rm -rf "$PLUGIN_DIR" "$PLUGIN_MANIFEST"
+}
+
 # new_project [with-fixture] — fresh scratch git project, echoes its path.
 new_project() {
   local dir
@@ -35,11 +91,11 @@ run_conversation() {
       cd "$proj" || exit 1
       if [[ -z "$session_id" ]]; then
         claude -p "$(cat "$turn_file")" \
-          --plugin-dir "$REPO" --model "${SCENARIO_MODEL:-$MODEL}" --max-turns "$turns_cap" \
+          --plugin-dir "$PLUGIN_DIR" --model "${SCENARIO_MODEL:-$MODEL}" --max-turns "$turns_cap" \
           --permission-mode bypassPermissions --output-format json
       else
         claude -p --resume "$session_id" "$(cat "$turn_file")" \
-          --plugin-dir "$REPO" --model "${SCENARIO_MODEL:-$MODEL}" --max-turns "$turns_cap" \
+          --plugin-dir "$PLUGIN_DIR" --model "${SCENARIO_MODEL:-$MODEL}" --max-turns "$turns_cap" \
           --permission-mode bypassPermissions --output-format json
       fi
     ) > "$turn_out" 2> "${turn_out%.json}.stderr" || true
