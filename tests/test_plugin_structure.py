@@ -379,7 +379,7 @@ class TestUpstreamPin:
         "skills/risks/security-catalog.csv",
         "skills/start/reference/clarity-agent.upstream.md",
         "skills/embed/SKILL.md",  # snippet inlined as a fenced template; header inside the fence
-        "NOTICE.md",  # quotes the upstream license; carries the full pin instead
+        "NOTICE.md",  # quotes the upstream license; points at upstream.json for the pin
     }
 
     def upstream_config(self) -> dict:
@@ -404,8 +404,8 @@ class TestUpstreamPin:
 
     def test_full_pin_in_docs(self) -> None:
         pin = self.upstream_config()["pin"]
-        for doc in ("NOTICE.md", "UPSTREAM.md"):
-            assert pin in (REPO / doc).read_text(encoding="utf-8"), f"{doc} missing the full pin {pin}"
+        doc = "UPSTREAM.md"
+        assert pin in (REPO / doc).read_text(encoding="utf-8"), f"{doc} missing the full pin {pin}"
 
     def test_vendored_files_all_watched(self) -> None:
         """Every file carrying a vendor header appears in the watch set."""

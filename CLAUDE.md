@@ -15,7 +15,7 @@ the contract before editing anything:
 - **Vendored files**: after touching anything in the upstream.json watch set,
   run `python3 scripts/upstream_audit.py` — unexplained changed lines fail CI.
   Vendored headers carry the pin; pin-consistency tests fail until headers,
-  upstream.json, NOTICE.md, and UPSTREAM.md agree.
+  upstream.json, and UPSTREAM.md agree.
 - **Zero dependencies**: everything runs on python3 stdlib. Nothing is pip-
   installed, ever — that includes the MCP server (hand-rolled stdio JSON-RPC,
   see the "Transport" note in PORTING.md).
