@@ -80,7 +80,7 @@ other source file. Nothing lives only in a chat transcript.
 
 (Plus working files: shared notes, analysis observations, mailboxes holding
 brainstormed failures awaiting review, and an archive kept for provenance.
-See [tests/e2e/fixtures/feature-flags-cli](tests/e2e/fixtures/feature-flags-cli)
+See [here](tests/e2e/fixtures/feature-flags-cli)
 for a complete protocol directory.)
 
 Documents form a dependency graph (problem → stakeholders → requirements →
