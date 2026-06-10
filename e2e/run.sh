@@ -51,6 +51,10 @@ for scenario in "$HERE"/scenarios/*/; do
   echo "── $name (fixture: $FIXTURE, max turns: $MAX_TURNS)"
   proj="$(new_project "$FIXTURE")"
   PROJECTS+=("$proj")
+  # Optional per-scenario state mutation (e.g. blank a doc, seed pool files).
+  if [[ -f "$scenario/setup.sh" ]]; then
+    bash "$scenario/setup.sh" "$proj" "$REPO" || { echo "    setup.sh failed"; overall=1; continue; }
+  fi
   out="$ART_DIR/$name.json"
   run_claude "$proj" "$scenario/prompt.md" "$MAX_TURNS" "$out"
 

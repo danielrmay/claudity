@@ -100,7 +100,7 @@ Structure each audience section:
 
 As you work on messaging, you'll discover things:
 
-- "This audience is going to hate that we do X" — that's a failure mode. Write it as a file in `.clarity-protocol/failures/pool/`.
+- "This audience is going to hate that we do X" — that's a failure mode. Record it with `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/pool_add.py" . message-clarification --title "..."` (description on stdin).
 - "We can't explain why this is safe because we haven't thought it through" — that's a gap in the solution. Note it.
 - "The story doesn't work because the problem statement is actually wrong" — that's a signal to revisit problem clarification.
 

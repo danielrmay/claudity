@@ -1,4 +1,4 @@
-<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/failure-analysis.md — modified per PORTING.md rules R1, R10, R14 -->
+<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/failure-analysis.md — modified per PORTING.md rules R1, R10, R14, R15 -->
 
 # Failure Analysis
 
@@ -159,7 +159,7 @@ Sometimes the user wants to look at a group that's been formed — to check the 
 Sometimes the discussion surfaces new "what could go wrong" ideas that weren't in the original pool.
 
 - Have a freeform conversation about what else could go wrong
-- Write any new raw failures as files in `.clarity-protocol/failures/pool/` (one file per failure, same format as brainstorming produces)
+- Record any new raw failures via `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/pool_add.py" . failure-analysis --title "..."` (description on stdin; one call per failure)
 - These become available for Activity A in the next iteration of the loop
 
 #### Breaking Out
@@ -346,6 +346,18 @@ Append interesting footnotes to `.clarity-protocol/observations.md` — things w
 - **Pattern notes**: Interesting interactions between failure modes, surprising findings, or observations about the system's overall risk profile that don't fit neatly into a single failure mode document.
 
 This file is a log, not a summary — append new observations rather than rewriting. Readers who want the quick picture look at `failures.md`; readers who want the full story read `observations.md`.
+
+<!-- claudity: R15 -->
+## Final Step: Record Document State
+
+Analysis is not complete until you run the status script to record baselines. This is a required step, not documentation:
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/protocol_status.py" . --record failures/failures.md
+```
+
+Never edit `config.json` by hand — `documentState` and `decisionState` are managed only by the status script, and hand-written entries leave the document untracked.
+<!-- /claudity: R15 -->
 
 ## Outputs and Updates
 

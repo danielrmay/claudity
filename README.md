@@ -137,7 +137,7 @@ knows what downstream needs revisiting.
 ```bash
 python3 -m venv .venv && .venv/bin/pip install pytest
 .venv/bin/pytest tests/ -q      # free, deterministic
-e2e/run.sh                      # headless behavioral smoke (~$0.25 on Haiku)
+e2e/run.sh                      # headless behavioral smoke (~$1 on Haiku)
 ```
 
 See [TESTING.md](TESTING.md) for the full test-tier breakdown and cost model,

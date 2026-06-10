@@ -12,20 +12,23 @@ Brainstorming can happen over time. Multiple runs can contribute, humans can add
 
 ## Recording Findings
 
-Raw failures live in the **brainstorming pool**: `.clarity-protocol/failures/pool/`, one markdown file per failure. Create the directory if it doesn't exist. Write each failure **as you identify it** — don't batch them up. File name: `<source>--<slug>.md` (e.g. `broad--silent-sync-data-loss.md`, `security-thinker--token-replay.md`, `human--regulator-history.md`).
+Raw failures live in the **brainstorming pool**: `.clarity-protocol/failures/pool/`, one markdown file per failure. **Always record failures with the pool script — never write pool files by hand.** The script owns placement, naming, and format; hand-written files end up in the wrong location and are invisible to the pipeline (the status engine counts only files at the pool's top level — never in `failures/` itself, `pool/archive/`, or any subdirectory).
 
-**Never write brainstormed failures directly into `failures/` itself.** Numbered `failure-NN-*.md` files there are *analyzed* failure modes — they are created only later, by the failure-analysis process, from this pool. **Never write into `failures/pool/archive/` either** — archived items have already been consumed by failure-analysis and won't be looked at again. New failures always go directly in `failures/pool/`, at the top level. Format:
+Record a single failure (your own broad analysis, or a user contribution) as you identify it — don't batch:
 
-```markdown
-# <Short title of what goes wrong>
-
-- **Source:** broad-analysis | <thinker-name> | human (<name or role>)
-- **Pre-existing:** yes | no   <!-- optional: does this failure exist before/independent of this project? -->
-
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/pool_add.py" . broad-analysis --title "Short title of what goes wrong" <<'EOF'
 <1-3 sentences: what fails, how, who is harmed>
 
-**Failure chain:** <step> → <step> → <harm>   <!-- optional -->
+- **Pre-existing:** yes | no
+
+**Failure chain:** <step> → <step> → <harm>
+EOF
 ```
+
+(The description body is free-form; Pre-existing and Failure chain lines are optional. Use source `human (<name or role>)` for user contributions.)
+
+The script prints each pool file it writes — confirm the count matches what you recorded.
 
 When your analysis reveals gaps or ambiguities in project documents (missing stakeholders, uncaptured requirements), append a note to `.clarity-protocol/notes.md` tagged for the relevant document, e.g. `[for: problem-clarification] Stakeholders list is missing the on-call operators surfaced during failure brainstorming.`
 
@@ -50,7 +53,14 @@ To launch thinkers (Step 4):
    - the analysis mode: **quick** or **deep**
    - the absolute path to `<plugin-root>/skills/claudity/processes/failure-reasoning-guidelines.md`
    - for `security-catalog-thinker` only: the absolute path to `<plugin-root>/catalogs/security-catalog.csv`
-3. Each thinker returns structured `## Failures` / `## Suggestions` / `## Specialist recommendations` blocks. Persist every returned failure as its own file in `.clarity-protocol/failures/pool/` named `<thinker-name>--<slug>.md` (format above, Source = the thinker's name) — not in `failures/` itself, and not indexed in `failures.md`. Apply suggestions to `notes.md`, and consider any specialist recommendations for the next round.
+3. Each thinker returns structured `## Failures` / `## Suggestions` / `## Specialist recommendations` blocks. Persist its failures by saving the thinker's full returned text to a temp file and running the pool script, which writes one correctly-placed pool file per failure and prints each path:
+
+   ```bash
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/pool_add.py" . <thinker-name> --file /tmp/<thinker-name>-output.md
+   ```
+
+   Confirm the printed count matches the thinker's `## Failures` blocks. Do not write pool files by hand and do not index them in `failures.md`.
+4. Apply suggestions to `notes.md`, and consider any specialist recommendations for the next round.
 
 Check prerequisites before launching: a thinker whose required documents are empty or missing will produce generic output — skip it and tell the user why.
 

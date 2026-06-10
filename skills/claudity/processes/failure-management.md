@@ -1,4 +1,4 @@
-<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/failure-management.md — modified per PORTING.md rules R1, R6, R10 -->
+<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/failure-management.md — modified per PORTING.md rules R1, R6, R10, R15 -->
 
 # Failure Management
 
@@ -261,7 +261,7 @@ Common examples:
 - Automated rollback creates "rollback oscillation" failure mode
 - Monitoring creates "alert fatigue" failure mode
 
-If you identify induced failures, add them as raw failure modes to the brainstorming pool (`.clarity-protocol/failures/pool/`, one file per failure) for the next analysis cycle. Note the connection in both documents.
+If you identify induced failures, add each as a raw failure mode to the brainstorming pool for the next analysis cycle: `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/pool_add.py" . failure-management --title "..."` (description on stdin). Note the connection in both documents.
 
 **If any intervention introduces a new component** — incident response, monitoring infrastructure, manual review workflows — note that this component needs its own design pass (Principle 6). It's a new part of the solution, and the full design process applies to it. At minimum, make sure the management plan answers the key design questions for that component (who operates it, what SLAs apply, what access is needed, whether staffing is adequate).
 
@@ -310,6 +310,10 @@ After writing, record document state for the files you updated. Always include `
 ```bash
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/protocol_status.py" . --record failures/failures.md [other updated docs]
 ```
+
+<!-- claudity: R15 -->
+This recording step is required — the process is not complete without it. Never edit `config.json` by hand; `documentState` and `decisionState` are managed only by the status script.
+<!-- /claudity: R15 -->
 
 ## Success Indicators
 

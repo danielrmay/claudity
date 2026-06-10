@@ -7,6 +7,20 @@ the upstream pin it tracks).
 
 ## [Unreleased]
 
+### Added
+
+- e2e scenarios 05-09 covering solution-brainstorming, architecture-design,
+  failure-analysis, failure-management, and message-clarification; the full
+  behavioral suite is now 9 scenarios (~$1 on Haiku)
+- PORTING.md rule R15 (additive reliability clarifications): explicit
+  record-state steps and a "never hand-edit config.json" guard in the
+  failure-analysis and failure-management guides, after the harness caught a
+  model inventing its own config bookkeeping
+- `scripts/pool_add.py`: deterministic pool recording (one correctly-placed
+  file per failure), replacing hand-written pool files in all guides. The
+  harness showed models repeatedly misplacing hand-written pool files —
+  re-learning upstream's reason for making `record_failure` a tool
+
 ### Removed
 
 - The experimental README warning, following the isolated real-session

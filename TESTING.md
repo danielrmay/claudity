@@ -10,7 +10,7 @@ small headless smoke suite with a hard cost budget, run locally on demand.
 | ---- | ---- | ---- | ---- |
 | 0 | `claude plugin validate .` + component inventory (`claude --plugin-dir . plugin details claudity`) | free | CI, every push |
 | 1 | `pytest tests/` — 71 vendored status-engine tests + structural tests (manifests, frontmatter, cross-reference integrity, porting lints, init↔staleness coupling) | free | CI, every push |
-| 2 | `e2e/run.sh` — 4 headless scenarios with deterministic artifact assertions | ~$0.25 on Haiku | locally, before a release or after touching SKILL.md / processes / commands / agents |
+| 2 | `e2e/run.sh` — 9 headless scenarios with deterministic artifact assertions | ~$1 on Haiku | locally, before a release or after touching SKILL.md / processes / commands / agents |
 
 ## Tier 1
 
@@ -37,7 +37,11 @@ e2e/run.sh 01       # one scenario by prefix
 Each scenario runs `claude -p` in a throwaway project with the plugin loaded
 via `--plugin-dir` (nothing is installed into your real config), then asserts
 on **artifacts** — files created, `config.json` state, status-script output —
-never on LLM-judged transcripts. A per-scenario cost table is printed from the
+never on LLM-judged transcripts. Scenario prompts must enter through real
+product surfaces (a `/claudity:*` command or the skill): a prompt that says
+"read the guide" without a path tests a phantom entry that no user docs
+suggest, and the model may never find the guide (this exact failure produced
+04-thinker's flakiness before it was switched to `/claudity:risks`). A per-scenario cost table is printed from the
 CLI's `total_cost_usd`, and the suite fails if the total exceeds the budget.
 
 | Scenario | Verifies |
@@ -46,6 +50,15 @@ CLI's `total_cost_usd`, and the suite fails if the total exceeds the budget.
 | 02-routing | `/claudity:status` runs the status script and correctly relays the recommended next process for a fixture packet |
 | 03-decide | `/claudity:decide` produces a real decision document, updates the index, and records `decisionState` (status `decided`, non-empty `relatedDocs`) |
 | 04-thinker | failure-brainstorming launches the `general-thinker` subagent and persists its findings to `failures/pool/`, flipping the status engine to recommend `failure-analysis` |
+| 05-solution | solution-brainstorming fills a blanked `solution.md` + `solution-summary.md` with real content and records them as current |
+| 06-architecture | architecture-design writes `architecture.md` with the Mermaid threat-model block plus a valid `system-design.json`, and records state |
+| 07-analysis | failure-analysis snapshots seeded pool files to `pool/archive/`, produces analyzed `failure-NN` documents and a real index, and records state |
+| 08-management | failure-management replaces a seeded placeholder `## Management Plan` with a real plan; the status engine stops recommending the phase |
+| 09-message | message-clarification writes a non-template general-audience `summary.md` and records it |
+
+Discovery (`discovery-research` / `discovery-prototype`) remains uncovered:
+their outputs are investigation programs and disposable prototypes with no
+cheap deterministic artifact contract.
 
 Environment variables:
 
