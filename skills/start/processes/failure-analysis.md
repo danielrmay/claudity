@@ -168,7 +168,7 @@ At any point, the user can say they want to work on something else. This is fine
 
 - All grouped failures are already written to files as they're resolved, so nothing is lost
 - Update the failures index (see Step 6)
-- Hand off to the claudity skill main loop (Step 1: reassess the state)
+- Hand off to the Claudity router (`start` skill) main loop (Step 1: reassess the state)
 - When the user returns to failure analysis later, pick up where you left off — the remaining ungrouped raw failures are still in the consumed snapshot, and existing groups are in the failure mode documents
 
 ### Step 5: Identify Cross-Cutting Patterns
@@ -205,7 +205,7 @@ When the user is satisfied or the ungrouped pool is empty:
 > - Return to any of these groups to refine them?
 > - Work on something else?"
 
-**Whatever the user chooses, keep the conversation going.** Hand off to the appropriate process, or return to the claudity skill main loop.
+**Whatever the user chooses, keep the conversation going.** Hand off to the appropriate process, or return to the Claudity router (`start` skill) main loop.
 
 ## How to Develop Failure Chains
 

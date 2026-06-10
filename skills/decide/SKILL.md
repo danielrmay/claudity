@@ -1,5 +1,11 @@
-<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/decision-guidance.md — modified per PORTING.md rules R1, R10 -->
+---
+name: decide
+description: "Work through an important decision with structured guidance"
+disable-model-invocation: true
+---
+<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/decision-guidance.md — modified per PORTING.md rules R1, R10, R16 (packaged as a skill) -->
 
+If there is no protocol directory yet, first scaffold one with `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/protocol_init.py" .` — decisions are recorded in `.clarity-protocol/decisions/`. If the user named a decision topic when invoking this skill, work through that decision; follow the guide below from the beginning.
 # Decision Guidance
 
 Help the user think through an important decision — one where the choice matters, the tradeoffs are real, and the reasoning should be captured.
@@ -135,4 +141,4 @@ Decisions are made in a context. When the context changes — new information, c
 
 ## Next Steps
 
-After a decision is made, return to the claudity skill (re-run the status script and reassess) to determine what needs attention — the decision may have made other documents stale or opened up new work.
+After a decision is made, return to the Claudity router — the `start` skill (re-run the status script and reassess) to determine what needs attention — the decision may have made other documents stale or opened up new work.

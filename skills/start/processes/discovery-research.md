@@ -198,7 +198,7 @@ Record the updated state:
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/protocol_status.py" . --record goal/open-questions.md
 ```
 
-Then return to the claudity skill for reassessment.
+Then return to the Claudity router (`start` skill) for reassessment.
 
 ## Sub-Processes
 
@@ -242,4 +242,4 @@ If the fastest way to answer a sub-question is to build something small and test
 
 ## Next Steps
 
-After recording findings, return to the claudity skill to reassess the project state. Resolved questions may unblock solution brainstorming, reveal new questions, or trigger decisions that need guidance.
+After recording findings, return to the Claudity router (`start` skill) to reassess the project state. Resolved questions may unblock solution brainstorming, reveal new questions, or trigger decisions that need guidance.

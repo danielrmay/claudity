@@ -137,7 +137,7 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/protocol_status.py" . --record goal/open-
 
 If the findings change the problem understanding, update `goal/problem.md` too — and record it. This will naturally trigger staleness on downstream documents.
 
-Then return to the claudity skill for reassessment. The resolved (or updated) question may unblock other work, surface new questions, or lead to decisions that need guidance.
+Then return to the Claudity router (`start` skill) for reassessment. The resolved (or updated) question may unblock other work, surface new questions, or lead to decisions that need guidance.
 
 ## Sub-Processes
 
@@ -180,4 +180,4 @@ Not every question needs a prototype. If the answer is reachable through careful
 
 ## Next Steps
 
-After recording findings, return to the claudity skill to reassess the project state: check whether the question is resolved, whether new questions emerged, and what should happen next.
+After recording findings, return to the Claudity router (`start` skill) to reassess the project state: check whether the question is resolved, whether new questions emerged, and what should happen next.

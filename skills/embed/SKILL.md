@@ -1,3 +1,27 @@
+---
+name: embed
+description: "Embed the Clarity Protocol into this project (scaffold protocol dir + CLAUDE.md snippet)"
+disable-model-invocation: true
+---
+
+Embed the Clarity Protocol into the current project. Both steps are idempotent — safe to re-run.
+
+1. **Scaffold the protocol directory:**
+
+   ```bash
+   python3 "${CLAUDE_PLUGIN_ROOT}/scripts/protocol_init.py" .
+   ```
+
+   This creates `.clarity-protocol/` (or `Clarity Protocol/` outside git repos) with template documents and `config.json`, skipping any files that already exist.
+
+2. **Install the snippet into CLAUDE.md:** take the template between the `SNIPPET-TEMPLATE` markers below (exclusive), replace every `{{PROTOCOL_DIR_NAME}}` with the actual protocol directory name from step 1, and place the result in the project's root `CLAUDE.md`:
+   - If `CLAUDE.md` doesn't exist, create it with the snippet as its content.
+   - If it exists and contains a `<!-- claudity-begin -->` ... `<!-- claudity-end -->` block, replace that block (and only that block) with the new snippet.
+   - Otherwise append the snippet to the end, separated by a blank line. Never modify content outside the markers.
+
+3. Confirm briefly what was created, then offer to start: the user can run `/claudity:start` or just begin talking about the project. The protocol directory is meant to be committed and reviewed like any other source file.
+
+<!-- SNIPPET-TEMPLATE-BEGIN (everything between these markers, exclusive, is the installable template) -->
 <!-- markdownlint-disable MD041 -->
 <!-- claudity-begin -->
 <!-- claudity-meta
@@ -5,21 +29,21 @@ schema_version: 1
 protocol_dir_name: {{PROTOCOL_DIR_NAME}}
 -->
 <!-- Claudity manages this block; edits between the claudity-begin / claudity-end markers will be overwritten when the snippet is refreshed. Put project-specific guidance outside the markers. -->
-<!-- Vendored from microsoft/clarity-agent@6b32c43 src/clarity_agent/setup/snippet.md — modified per PORTING.md rules R2, R3, R4, R5, R6, R10 (MCP tools → claudity skill and file operations) -->
+<!-- Vendored from microsoft/clarity-agent@6b32c43 src/clarity_agent/setup/snippet.md — modified per PORTING.md rules R2, R3, R4, R5, R6, R10, R16 (MCP tools → Claudity skills and file operations; template inlined in the embed skill) -->
 
 ## Clarity Protocol
 
-This project uses the Clarity Protocol for structured thinking about consequential decisions — what to build and why, how it should be designed, where it might fail. Protocol documents live in `{{PROTOCOL_DIR_NAME}}/`. The Claudity plugin manages the protocol — use its `claudity` skill and commands to interact with it.
+This project uses the Clarity Protocol for structured thinking about consequential decisions — what to build and why, how it should be designed, where it might fail. Protocol documents live in `{{PROTOCOL_DIR_NAME}}/`. The Claudity plugin manages the protocol — use its skills (`/claudity:start`, `/claudity:status`, and friends) to interact with it.
 
 ### When to engage
 
 **Before building — think when it matters.** Two triggers:
 
-1. *The user asks.* When they want to explore what to build, clarify requirements, brainstorm risks, or work through a decision: use the `claudity` skill (or `/claudity:start`).
+1. *The user asks.* When they want to explore what to build, clarify requirements, brainstorm risks, or work through a decision: use Claudity's `start` skill (`/claudity:start`).
 
 2. *You recognize an inflection point.* Before making choices that would be expensive to reverse — new services, auth/trust models, data schemas, external integrations, significant API contracts — check what you plan to do against the protocol: read `{{PROTOCOL_DIR_NAME}}/decisions/decisions.md`, `goal/requirements.md`, and `solution/architecture.md` for conflicts. Don't interrupt for routine implementation. The test: "If this turns out wrong, is it a 5-minute fix or a multi-day rework?" Interrupt for the latter.
 
-**After building — keep the record current.** After significant implementation work (new features, architectural changes), run the `/claudity:status` command (or engage the `claudity` skill) to find stale protocol documents — the plugin resolves its own script paths; do not try to locate or run them directly from this file. Update stale documents in place, and let the skill record acceptance. Record significant choices as numbered files in `{{PROTOCOL_DIR_NAME}}/decisions/` (the `claudity` skill's decision-guidance process covers the format); add newly-noticed risks to the failure pool via the `claudity` skill's failure-brainstorming process.
+**After building — keep the record current.** After significant implementation work (new features, architectural changes), run the `/claudity:status` command (or engage Claudity's `start` skill) to find stale protocol documents — the plugin resolves its own script paths; do not try to locate or run them directly from this file. Update stale documents in place, and let the skill record acceptance. Record significant choices as numbered files in `{{PROTOCOL_DIR_NAME}}/decisions/` (the `/claudity:decide` skill covers the format); add newly-noticed risks to the failure pool via the `/claudity:risks` skill.
 
 ### Behaviors (apply throughout)
 
@@ -32,3 +56,4 @@ This project uses the Clarity Protocol for structured thinking about consequenti
 **Generate threat model artifacts.** When writing or updating `solution/architecture.md`, include a Mermaid threat model diagram directly in the file as a fenced ` ```mermaid ` block. Write the diagram yourself; you'll produce a better diagram than any code generator. Also write `{{PROTOCOL_DIR_NAME}}/system-design.json` with structured component/flow/threat data for tooling. After failure brainstorming or analysis, write `{{PROTOCOL_DIR_NAME}}/threat-model.md` — a concise threat model summary (1-2 pages max) with top risks, severities, one-line mitigations, and single points of failure.
 
 <!-- claudity-end -->
+<!-- SNIPPET-TEMPLATE-END -->

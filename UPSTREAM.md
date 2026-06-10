@@ -15,21 +15,21 @@ table below is commentary on the same mapping.
 
 | Upstream path | Claudity path | Fidelity |
 |---|---|---|
-| `processes/clarity-agent.md` | `skills/claudity/reference/clarity-agent.upstream.md` | verbatim (reference only, not executed) |
-| `processes/clarity-agent.md` | `skills/claudity/SKILL.md` + `skills/claudity/reference/routing.md` | rewritten as the router skill |
-| `processes/problem-clarification.md` | `skills/claudity/processes/problem-clarification.md` | near-verbatim + PORTING rules |
-| `processes/decision-guidance.md` | `skills/claudity/processes/decision-guidance.md` | near-verbatim + PORTING rules |
-| `processes/solution-brainstorming.md` | `skills/claudity/processes/solution-brainstorming.md` | near-verbatim + PORTING rules |
-| `processes/architecture-design.md` | `skills/claudity/processes/architecture-design.md` | near-verbatim + PORTING rules |
-| `processes/discovery-research.md` | `skills/claudity/processes/discovery-research.md` | near-verbatim + PORTING rules |
-| `processes/discovery-prototype.md` | `skills/claudity/processes/discovery-prototype.md` | near-verbatim + PORTING rules |
-| `processes/message-clarification.md` | `skills/claudity/processes/message-clarification.md` | near-verbatim + PORTING rules |
-| `processes/failure-brainstorming.md` | `skills/claudity/processes/failure-brainstorming.md` | adapted (mailbox → parallel subagents, R9/R14) |
-| `processes/failure-analysis.md` | `skills/claudity/processes/failure-analysis.md` | near-verbatim + PORTING rules |
-| `processes/failure-management.md` | `skills/claudity/processes/failure-management.md` | near-verbatim + PORTING rules |
-| `processes/failure-reasoning-guidelines.md` | `skills/claudity/processes/failure-reasoning-guidelines.md` | verbatim |
+| `processes/clarity-agent.md` | `skills/start/reference/clarity-agent.upstream.md` | verbatim (reference only, not executed) |
+| `processes/clarity-agent.md` | `skills/start/SKILL.md` + `skills/start/reference/routing.md` | rewritten as the router skill |
+| `processes/problem-clarification.md` | `skills/start/processes/problem-clarification.md` | near-verbatim + PORTING rules |
+| `processes/decision-guidance.md` | `skills/decide/SKILL.md` | near-verbatim + PORTING rules (packaged as a skill, R16) |
+| `processes/solution-brainstorming.md` | `skills/start/processes/solution-brainstorming.md` | near-verbatim + PORTING rules |
+| `processes/architecture-design.md` | `skills/start/processes/architecture-design.md` | near-verbatim + PORTING rules |
+| `processes/discovery-research.md` | `skills/start/processes/discovery-research.md` | near-verbatim + PORTING rules |
+| `processes/discovery-prototype.md` | `skills/start/processes/discovery-prototype.md` | near-verbatim + PORTING rules |
+| `processes/message-clarification.md` | `skills/message/SKILL.md` | near-verbatim + PORTING rules (packaged as a skill, R16) |
+| `processes/failure-brainstorming.md` | `skills/risks/SKILL.md` | adapted (mailbox → parallel subagents, R9/R14; packaged as a skill, R16) |
+| `processes/failure-analysis.md` | `skills/start/processes/failure-analysis.md` | near-verbatim + PORTING rules |
+| `processes/failure-management.md` | `skills/start/processes/failure-management.md` | near-verbatim + PORTING rules |
+| `processes/failure-reasoning-guidelines.md` | `skills/start/processes/failure-reasoning-guidelines.md` | verbatim |
 | `thinkers/*.md` (6 files) | `agents/*.md` | body near-verbatim; frontmatter converted to Claude Code agent format, upstream metadata moved to a body section |
-| `src/clarity_agent/setup/snippet.md` | `skills/claudity/reference/snippet.md` | adapted for CLAUDE.md / no MCP server |
+| `src/clarity_agent/setup/snippet.md` | `skills/embed/SKILL.md` | adapted for CLAUDE.md / no MCP server; inlined as the embed skill's template section (R16) |
 | `src/clarity_agent/protocol/packet_status.py` | `scripts/protocol_status.py` | whole file; package imports inlined (see its docstring) |
 | `src/clarity_agent/protocol/initialize.py` | `scripts/protocol_init.py` | adapted (see its docstring); templates verbatim |
 | `catalogs/security-catalog.csv` | `catalogs/security-catalog.csv` | verbatim |

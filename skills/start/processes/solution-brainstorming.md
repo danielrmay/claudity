@@ -121,4 +121,4 @@ If solution brainstorming surfaces a failure concern, an edge case, or an archit
 
 ## Next Steps
 
-After solution brainstorming, return to the claudity skill (re-run the status script and reassess) to determine what needs attention next.
+After solution brainstorming, return to the Claudity router — the `start` skill (re-run the status script and reassess) to determine what needs attention next.

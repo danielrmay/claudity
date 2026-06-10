@@ -7,6 +7,18 @@ the upstream pin it tracks).
 
 ## [Unreleased]
 
+### Changed (architecture)
+
+- Commands eliminated: every user surface is now a skill, and the 1:1 guide
+  surfaces embed their vendored guide as the skill body — `/claudity:decide`,
+  `/claudity:risks`, `/claudity:message` inject their guide directly (no
+  pointer text, no Read hop, no fs seek); `/claudity:embed` inlines the
+  CLAUDE.md snippet template (zero seeks); the router directory is
+  `skills/start/` so `/claudity:start` invokes it directly. Skill bodies get
+  the plugin root substituted at injection, removing the hook dependency on
+  the command path. PORTING.md rule R16 covers the skill packaging. UX
+  (`/claudity:*` names) unchanged.
+
 ### Added
 
 - e2e v2: scenarios are scripted multi-turn persona conversations (verbatim

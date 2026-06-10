@@ -1,5 +1,5 @@
 ---
-name: claudity
+name: start
 description: "An AI thinking partner that pushes back. Use when the user wants to think through what they're building and why — explore or clarify a problem, requirements, or stakeholders; weigh a solution or architecture; brainstorm risks and failure modes; or work through a consequential decision. Also use proactively at inflection points: before choices that would be expensive to reverse (new services, auth/trust models, data schemas, external integrations, significant API contracts) — if getting it wrong means a multi-day rework rather than a 5-minute fix, engage. Works for software and non-software projects alike."
 ---
 
@@ -74,7 +74,7 @@ That's a sensible default, not a rule — if the user wants to work on something
 Once you know what to work on:
 
 1. Tell the user what you suggest and why.
-2. Read the process guide from `${CLAUDE_PLUGIN_ROOT}/skills/claudity/processes/<name>.md` and follow it from its beginning. **Never run a process from memory:** if you have not Read the named guide in this session, read it before doing any process work — the guides contain required pipeline steps (pool snapshots, scripts to run, state recording) that freehand work will miss, leaving the packet silently inconsistent. Re-read a guide only when switching processes, not on every turn.
+2. Read the process guide and follow it from its beginning. Guides live at `${CLAUDE_PLUGIN_ROOT}/skills/start/processes/<name>.md`, except three that are also directly invocable skills: `decision-guidance` → `${CLAUDE_PLUGIN_ROOT}/skills/decide/SKILL.md`, `failure-brainstorming` → `${CLAUDE_PLUGIN_ROOT}/skills/risks/SKILL.md`, `message-clarification` → `${CLAUDE_PLUGIN_ROOT}/skills/message/SKILL.md` (skip their frontmatter block when following). **Never run a process from memory:** if you have not Read the named guide in this session, read it before doing any process work — the guides contain required pipeline steps (pool snapshots, scripts to run, state recording) that freehand work will miss, leaving the packet silently inconsistent. Re-read a guide only when switching processes, not on every turn.
 3. The guides reference plugin scripts via a `CLAUDE_PLUGIN_ROOT` placeholder that is **not set in the Bash environment** — substitute the absolute plugin root (provided in your session context at startup, and visible as this skill's own path prefix). Never run a command containing the unexpanded placeholder, and don't pipe these commands through `tail`/`head` in ways that hide their errors.
 
 **After any process completes, return here**: re-run the status script, see what changed, and guide the user to the next useful thing. Never leave them in silence wondering what happens next.
@@ -83,14 +83,14 @@ Once you know what to work on:
 
 - **problem-clarification** — Understand what you're building and why
 - **solution-brainstorming** — Explore solution approaches
-- **failure-brainstorming** — Generate raw failure modes from multiple perspectives
+- **failure-brainstorming** — Generate raw failure modes from multiple perspectives (also `/claudity:risks`)
 - **failure-analysis** — Group raw failures into failure modes with chains and intervention points
 - **failure-management** — Develop management plans for identified failure modes
 - **architecture-design** — Create technical designs
 - **discovery-prototype** — Test a specific hypothesis through minimal, focused implementation
 - **discovery-research** — Design and execute a research program to answer open questions
-- **message-clarification** — Build the project narrative and audience-specific messaging
-- **decision-guidance** — Think through important decisions (cross-cutting, invoked from any process)
+- **message-clarification** — Build the project narrative and audience-specific messaging (also `/claudity:message`)
+- **decision-guidance** — Think through important decisions (cross-cutting, invoked from any process; also `/claudity:decide`)
 
 ## Common Pitfalls
 

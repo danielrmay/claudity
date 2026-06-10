@@ -25,13 +25,14 @@ Each vendored markdown file starts with a header comment:
 | R5 | MCP `record_decision(...)` | Write `decisions/decision-NN-<slug>.md` (NN = highest existing + 1), update the `decisions/decisions.md` index, then R1 `--record-decision <id> --status <s> --related-docs <docs>` |
 | R6 | MCP `record_failure(...)` / `ai_actions.brainstorm record-failure` | `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/pool_add.py" <project_dir> <source>` (one pool file per failure; never hand-written — the e2e harness showed models misplace hand-written pool files, re-learning why upstream made this a tool) |
 | R7 | MCP `record_suggestion(...)` / `ai_actions.suggestion record` | Append to `.clarity-protocol/notes.md` tagged `[for: <phase>]` |
-| R8 | `run_clarity(process)` / "switch to process X" | Read `${CLAUDE_PLUGIN_ROOT}/skills/claudity/processes/<x>.md` and continue in-conversation |
+| R8 | `run_clarity(process)` / "switch to process X" | Read `${CLAUDE_PLUGIN_ROOT}/skills/start/processes/<x>.md` and continue in-conversation |
 | R9 | `read_thinker_guide(name)` + mailbox dispatch, lockfiles, polling | Launch the named thinker subagent (`agents/<name>.md`) via the Agent tool — in parallel when running several; the orchestrator persists each subagent's returned findings via `pool_add.py` (R6) |
-| R10 | References to `clarity-agent.md` (the upstream router) | References to the claudity skill / `/claudity:start` |
+| R10 | References to `clarity-agent.md` (the upstream router) | References to the Claudity router skill (`/claudity:start`) |
 | R11 | Paths to `catalogs/security-catalog.csv` or other plugin files inside thinker/process text | The orchestrator resolves the absolute path under `${CLAUDE_PLUGIN_ROOT}` and injects it into the subagent prompt (env vars are not expanded inside agent bodies) |
 | R12 | Instructions specific to the Clarity UI, transcripts, docx/packet export, or installer | Deleted, with an HTML comment `<!-- deleted per R12: ... -->` marking the spot |
 | R13 | `python -m clarity_agent.protocol.initialize <dir>` | `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/protocol_init.py" <project_dir>` via Bash |
 | R14 | `python -m clarity_agent.protocol.mailbox snapshot/write ...` | Move processed pool files to `failures/pool/archive/<YYYY-MM-DD>/`; write new raw failures as plain files in `failures/pool/` |
+| R16 | Guides/templates with a 1:1 user entry surface (decision-guidance, failure-brainstorming, message-clarification, the agent snippet) | Packaged as skills: Claude Code frontmatter and a short preamble prepended above the vendor header; the vendored text itself remains governed by the other rules. (R15 is retired — see CHANGELOG.) |
 
 ## Vendored Python and tests
 

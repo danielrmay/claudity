@@ -1,5 +1,11 @@
-<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/message-clarification.md — modified per PORTING.md rules R1, R6, R10 -->
+---
+name: message
+description: "Build the project narrative and audience-specific messaging"
+disable-model-invocation: true
+---
+<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/message-clarification.md — modified per PORTING.md rules R1, R6, R10, R16 (packaged as a skill) -->
 
+This works best when the problem and solution documents have real content — if they're still templates, say so and route through Claudity's `start` skill first. If the user named an audience or messaging focus when invoking this skill, honor it; follow the guide below from the beginning.
 # Message Clarification
 
 Build the narrative that explains what this project is and why anyone should care — starting with the general story and optionally developing audience-specific versions.
@@ -161,4 +167,4 @@ Different audiences have different concerns. That's why they get different narra
 
 ## Next Steps
 
-After message clarification, return to the claudity skill (re-run the status script and reassess) to determine what needs attention next.
+After message clarification, return to the Claudity router — the `start` skill (re-run the status script and reassess) to determine what needs attention next.

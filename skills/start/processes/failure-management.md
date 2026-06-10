@@ -292,7 +292,7 @@ Tell the user what was decided:
 - If there are tradeoffs that need decisions, offer to run **decision-guidance**.
 - If new failure modes were identified, offer to run **failure-brainstorming** or fold them into the analysis conversation.
 - If management plans require significant changes to the solution or architecture, note that those documents should be updated and offer to work on that.
-- Otherwise, return to the claudity skill main loop.
+- Otherwise, return to the Claudity router (`start` skill) main loop.
 
 ## Outputs and Updates
 

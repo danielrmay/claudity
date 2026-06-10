@@ -580,7 +580,7 @@ Synthesize. If they talk for 10 minutes, your problem statement should still be 
 
 ## Next Steps
 
-After problem clarification, return to the claudity skill (re-run the status script and reassess) to determine what needs attention next. Typical follow-on processes are:
+After problem clarification, return to the Claudity router — the `start` skill (re-run the status script and reassess) to determine what needs attention next. Typical follow-on processes are:
 
 - **solution-brainstorming.md** - Now that the problem is clear, explore solutions
 - **architecture-design.md** - If the solution approach is known, design the implementation

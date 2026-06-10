@@ -3,31 +3,110 @@
   "pin": "6b32c4349502d56d1c2e863c4778b322f8ff9466",
   "upstream_version": "v0.1.2",
   "watch": [
-    { "upstream": "processes/clarity-agent.md", "local": "skills/claudity/reference/clarity-agent.upstream.md" },
-    { "upstream": "processes/problem-clarification.md", "local": "skills/claudity/processes/problem-clarification.md" },
-    { "upstream": "processes/decision-guidance.md", "local": "skills/claudity/processes/decision-guidance.md" },
-    { "upstream": "processes/solution-brainstorming.md", "local": "skills/claudity/processes/solution-brainstorming.md" },
-    { "upstream": "processes/architecture-design.md", "local": "skills/claudity/processes/architecture-design.md" },
-    { "upstream": "processes/discovery-research.md", "local": "skills/claudity/processes/discovery-research.md" },
-    { "upstream": "processes/discovery-prototype.md", "local": "skills/claudity/processes/discovery-prototype.md" },
-    { "upstream": "processes/message-clarification.md", "local": "skills/claudity/processes/message-clarification.md" },
-    { "upstream": "processes/failure-brainstorming.md", "local": "skills/claudity/processes/failure-brainstorming.md" },
-    { "upstream": "processes/failure-analysis.md", "local": "skills/claudity/processes/failure-analysis.md" },
-    { "upstream": "processes/failure-management.md", "local": "skills/claudity/processes/failure-management.md" },
-    { "upstream": "processes/failure-reasoning-guidelines.md", "local": "skills/claudity/processes/failure-reasoning-guidelines.md" },
-    { "upstream": "thinkers/general-thinker.md", "local": "agents/general-thinker.md" },
-    { "upstream": "thinkers/security-thinker.md", "local": "agents/security-thinker.md" },
-    { "upstream": "thinkers/human-factors-thinker.md", "local": "agents/human-factors-thinker.md" },
-    { "upstream": "thinkers/adversarial-analysis-thinker.md", "local": "agents/adversarial-analysis-thinker.md" },
-    { "upstream": "thinkers/codebase-scanner-thinker.md", "local": "agents/codebase-scanner-thinker.md" },
-    { "upstream": "thinkers/security-catalog-thinker.md", "local": "agents/security-catalog-thinker.md" },
-    { "upstream": "src/clarity_agent/setup/snippet.md", "local": "skills/claudity/reference/snippet.md" },
-    { "upstream": "src/clarity_agent/protocol/packet_status.py", "local": "scripts/protocol_status.py" },
-    { "upstream": "src/clarity_agent/protocol/initialize.py", "local": "scripts/protocol_init.py" },
-    { "upstream": "catalogs/security-catalog.csv", "local": "catalogs/security-catalog.csv" },
-    { "upstream": "tests/test_packet_status.py", "local": "tests/test_protocol_status.py" },
-    { "upstream": "tests/conftest.py", "local": "tests/conftest.py" },
-    { "upstream": "LICENSE", "local": "NOTICE.md" }
+    {
+      "upstream": "processes/clarity-agent.md",
+      "local": "skills/start/reference/clarity-agent.upstream.md"
+    },
+    {
+      "upstream": "processes/problem-clarification.md",
+      "local": "skills/start/processes/problem-clarification.md"
+    },
+    {
+      "upstream": "processes/decision-guidance.md",
+      "local": "skills/decide/SKILL.md"
+    },
+    {
+      "upstream": "processes/solution-brainstorming.md",
+      "local": "skills/start/processes/solution-brainstorming.md"
+    },
+    {
+      "upstream": "processes/architecture-design.md",
+      "local": "skills/start/processes/architecture-design.md"
+    },
+    {
+      "upstream": "processes/discovery-research.md",
+      "local": "skills/start/processes/discovery-research.md"
+    },
+    {
+      "upstream": "processes/discovery-prototype.md",
+      "local": "skills/start/processes/discovery-prototype.md"
+    },
+    {
+      "upstream": "processes/message-clarification.md",
+      "local": "skills/message/SKILL.md"
+    },
+    {
+      "upstream": "processes/failure-brainstorming.md",
+      "local": "skills/risks/SKILL.md"
+    },
+    {
+      "upstream": "processes/failure-analysis.md",
+      "local": "skills/start/processes/failure-analysis.md"
+    },
+    {
+      "upstream": "processes/failure-management.md",
+      "local": "skills/start/processes/failure-management.md"
+    },
+    {
+      "upstream": "processes/failure-reasoning-guidelines.md",
+      "local": "skills/start/processes/failure-reasoning-guidelines.md"
+    },
+    {
+      "upstream": "thinkers/general-thinker.md",
+      "local": "agents/general-thinker.md"
+    },
+    {
+      "upstream": "thinkers/security-thinker.md",
+      "local": "agents/security-thinker.md"
+    },
+    {
+      "upstream": "thinkers/human-factors-thinker.md",
+      "local": "agents/human-factors-thinker.md"
+    },
+    {
+      "upstream": "thinkers/adversarial-analysis-thinker.md",
+      "local": "agents/adversarial-analysis-thinker.md"
+    },
+    {
+      "upstream": "thinkers/codebase-scanner-thinker.md",
+      "local": "agents/codebase-scanner-thinker.md"
+    },
+    {
+      "upstream": "thinkers/security-catalog-thinker.md",
+      "local": "agents/security-catalog-thinker.md"
+    },
+    {
+      "upstream": "src/clarity_agent/setup/snippet.md",
+      "local": "skills/embed/SKILL.md"
+    },
+    {
+      "upstream": "src/clarity_agent/protocol/packet_status.py",
+      "local": "scripts/protocol_status.py"
+    },
+    {
+      "upstream": "src/clarity_agent/protocol/initialize.py",
+      "local": "scripts/protocol_init.py"
+    },
+    {
+      "upstream": "catalogs/security-catalog.csv",
+      "local": "catalogs/security-catalog.csv"
+    },
+    {
+      "upstream": "tests/test_packet_status.py",
+      "local": "tests/test_protocol_status.py"
+    },
+    {
+      "upstream": "tests/conftest.py",
+      "local": "tests/conftest.py"
+    },
+    {
+      "upstream": "LICENSE",
+      "local": "NOTICE.md"
+    }
   ],
-  "watch_new_files_in": ["processes/", "thinkers/", "catalogs/"]
+  "watch_new_files_in": [
+    "processes/",
+    "thinkers/",
+    "catalogs/"
+  ]
 }

@@ -23,12 +23,20 @@ from protocol_init import init_protocol  # via conftest sys.path
 from protocol_status import DEFAULT_DEPENDENCIES, DOCUMENT_PROCESS, check_packet_status
 
 REPO = Path(__file__).resolve().parent.parent
-PROCESSES_DIR = REPO / "skills" / "claudity" / "processes"
+PROCESSES_DIR = REPO / "skills" / "start" / "processes"
 AGENTS_DIR = REPO / "agents"
-COMMANDS_DIR = REPO / "commands"
-SKILL_MD = REPO / "skills" / "claudity" / "SKILL.md"
+SKILLS_DIR = REPO / "skills"
+SKILL_MD = REPO / "skills" / "start" / "SKILL.md"
 
-EXPECTED_COMMANDS = {"start", "embed", "status", "decide", "risks", "message"}
+# Surface skills: user-invocable entries. The router lives in skills/start/
+# but is named "start"; the others embed their content directly (no commands).
+EXPECTED_SURFACE_SKILLS = {"embed", "status", "decide", "risks", "message"}
+# Guides that moved into surface-skill bodies (1:1 user entries).
+GUIDE_SKILLS = {
+    "decide": "decision-guidance",
+    "risks": "failure-brainstorming",
+    "message": "message-clarification",
+}
 EXPECTED_AGENTS = {
     "general-thinker",
     "security-thinker",
@@ -103,7 +111,7 @@ class TestManifests:
 class TestFrontmatter:
     def test_skill(self) -> None:
         fm = parse_frontmatter(SKILL_MD)
-        assert fm["name"] == "claudity"
+        assert fm["name"] == "start"
         assert len(fm["description"]) > 100, "skill description is the ambient trigger — keep it substantive"
 
     def test_agents(self) -> None:
@@ -116,19 +124,30 @@ class TestFrontmatter:
             tools = {t.strip() for t in fm["tools"].split(",")}
             assert tools <= {"Read", "Grep", "Glob"}, f"{f.name}: thinkers must be read-only, got {tools}"
 
-    def test_commands(self) -> None:
-        files = sorted(COMMANDS_DIR.glob("*.md"))
-        assert {f.stem for f in files} == EXPECTED_COMMANDS
-        for f in files:
-            fm = parse_frontmatter(f)
-            assert fm["description"], f"{f.name}: missing description"
+    def test_surface_skills(self) -> None:
+        dirs = {d.name for d in SKILLS_DIR.iterdir() if d.is_dir()} - {"start"}
+        assert dirs == EXPECTED_SURFACE_SKILLS
+        for name in sorted(EXPECTED_SURFACE_SKILLS):
+            fm = parse_frontmatter(SKILLS_DIR / name / "SKILL.md")
+            assert fm["name"] == name
+            assert fm["description"], f"{name}: missing description"
+            assert fm.get("disable-model-invocation") == "true", (
+                f"{name}: surface skills are user-invoked only (router handles ambient)"
+            )
+
+    def test_guide_skills_carry_vendor_headers(self) -> None:
+        for skill, process in GUIDE_SKILLS.items():
+            text = (SKILLS_DIR / skill / "SKILL.md").read_text()
+            assert f"processes/{process}.md" in text.splitlines()[5], (
+                f"{skill}: vendor header for {process} missing under frontmatter"
+            )
 
     def test_frontmatter_is_strict_yaml(self) -> None:
         """Strict parsers silently drop ALL fields on invalid YAML (e.g. an
         unquoted description containing ': '). Caught in the wild by
         `claude plugin tag`; guarded here for every frontmatter file."""
         yaml = pytest.importorskip("yaml")
-        files = [SKILL_MD] + sorted(AGENTS_DIR.glob("*.md")) + sorted(COMMANDS_DIR.glob("*.md"))
+        files = sorted(SKILLS_DIR.glob("*/SKILL.md")) + sorted(AGENTS_DIR.glob("*.md"))
         bad: list[str] = []
         for f in files:
             try:
@@ -160,7 +179,7 @@ class TestCrossReferences:
         body = SKILL_MD.read_text()
         map_section = body.split("## Process Map")[1].split("##")[0]
         mapped = set(re.findall(r"- \*\*([\w-]+)\*\*", map_section))
-        on_disk = {f.stem for f in PROCESSES_DIR.glob("*.md")}
+        on_disk = {f.stem for f in PROCESSES_DIR.glob("*.md")} | set(GUIDE_SKILLS.values())
         assert mapped <= on_disk, f"process map names without guide files: {mapped - on_disk}"
         assert on_disk - mapped == NON_PROCESS_GUIDES, (
             f"guide files not in process map (and not known references): "
@@ -169,14 +188,14 @@ class TestCrossReferences:
 
     def test_thinker_table_matches_agents(self) -> None:
         """failure-brainstorming.md's thinker table names real agents."""
-        body = (PROCESSES_DIR / "failure-brainstorming.md").read_text()
+        body = (SKILLS_DIR / "risks" / "SKILL.md").read_text()
         table_section = body.split("## Specialist Thinkers")[1].split("## When")[0]
         listed = set(re.findall(r"^\| `([\w-]+)`", table_section, re.MULTILINE))
         assert listed == EXPECTED_AGENTS
 
     def test_document_process_names_have_guides(self) -> None:
         """Every process the status script can recommend has a guide file."""
-        on_disk = {f.stem for f in PROCESSES_DIR.glob("*.md")}
+        on_disk = {f.stem for f in PROCESSES_DIR.glob("*.md")} | set(GUIDE_SKILLS.values())
         # _resolve_process can also return the dynamic failure phases.
         recommendable = {p for p in DOCUMENT_PROCESS.values() if p} | {
             "failure-brainstorming", "failure-management",
@@ -190,7 +209,8 @@ class TestCrossReferences:
 
 class TestPortingInvariants:
     def vendored_files(self) -> list[Path]:
-        return sorted(PROCESSES_DIR.glob("*.md")) + sorted(AGENTS_DIR.glob("*.md"))
+        guide_skills = [SKILLS_DIR / s / "SKILL.md" for s in GUIDE_SKILLS]
+        return sorted(PROCESSES_DIR.glob("*.md")) + sorted(AGENTS_DIR.glob("*.md")) + guide_skills
 
     def test_vendor_headers_present(self) -> None:
         missing = [
@@ -225,8 +245,14 @@ class TestProtocolScaffolding:
         report = check_packet_status(pd)
         assert set(report["summary"]["empty"]) == set(DEFAULT_DEPENDENCIES)
 
+    def snippet_template(self) -> str:
+        body = (REPO / "skills" / "embed" / "SKILL.md").read_text()
+        start = body.index("SNIPPET-TEMPLATE-BEGIN")
+        end = body.index("SNIPPET-TEMPLATE-END")
+        return body[start:end]
+
     def test_snippet_markers(self) -> None:
-        snippet = (REPO / "skills" / "claudity" / "reference" / "snippet.md").read_text()
+        snippet = self.snippet_template()
         assert "<!-- claudity-begin -->" in snippet
         assert "<!-- claudity-end -->" in snippet
         assert snippet.count("{{PROTOCOL_DIR_NAME}}") >= 2
@@ -242,8 +268,7 @@ class TestProtocolScaffolding:
         """The snippet is copied into user projects' CLAUDE.md, where
         ${CLAUDE_PLUGIN_ROOT} is not defined — it must route through the
         plugin's commands/skill instead of invoking script paths."""
-        snippet = (REPO / "skills" / "claudity" / "reference" / "snippet.md").read_text()
-        assert "CLAUDE_PLUGIN_ROOT" not in snippet
+        assert "CLAUDE_PLUGIN_ROOT" not in self.snippet_template()
 
     def test_init_version_matches_plugin(self, tmp_path: Path) -> None:
         """Packets record which Claudity version scaffolded them."""
@@ -262,7 +287,8 @@ class TestUpstreamPin:
     # Verbatim vendored files that cannot carry a header comment.
     HEADER_EXEMPT = {
         "catalogs/security-catalog.csv",
-        "skills/claudity/reference/clarity-agent.upstream.md",
+        "skills/start/reference/clarity-agent.upstream.md",
+        "skills/embed/SKILL.md",  # snippet inlined as a fenced template; header inside the fence
         "NOTICE.md",  # quotes the upstream license; carries the full pin instead
     }
 
@@ -296,7 +322,7 @@ class TestUpstreamPin:
         cfg = self.upstream_config()
         watched = {w["local"] for w in cfg["watch"]}
         # SKILL.md and routing.md are rewrites of the watched upstream router.
-        rewrites = {"skills/claudity/SKILL.md", "skills/claudity/reference/routing.md"}
+        rewrites = {"skills/start/SKILL.md", "skills/start/reference/routing.md"}
         unwatched = [
             str(p.relative_to(REPO))
             for p in repo_markdown_files()
@@ -334,5 +360,5 @@ class TestClaudeCli:
             capture_output=True, text=True, timeout=120,
         )
         assert r.returncode == 0, r.stdout + r.stderr
-        for component in {"claudity"} | EXPECTED_COMMANDS | EXPECTED_AGENTS:
+        for component in {"start"} | EXPECTED_SURFACE_SKILLS | EXPECTED_AGENTS:
             assert component in r.stdout, f"component not loaded: {component}"

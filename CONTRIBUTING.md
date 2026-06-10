@@ -53,7 +53,7 @@ porting it here. For a Claudity-only thinker:
    exactly from an existing thinker). The orchestrator parses this and
    persists failures to `failures/pool/`; your agent only returns text.
 4. **Register it** in two places: the Specialist Thinkers table in
-   `skills/claudity/processes/failure-brainstorming.md` (name, lens, required
+   `skills/risks/SKILL.md` (the failure-brainstorming guide) (name, lens, required
    prerequisites), and `EXPECTED_AGENTS` in `tests/test_plugin_structure.py`.
 5. **Verify:** `.venv/bin/pytest tests/ -q`, then optionally run the thinker
    for real against `examples/feature-flags-cli` via the

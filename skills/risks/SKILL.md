@@ -1,5 +1,11 @@
-<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/failure-brainstorming.md — modified per PORTING.md rules R1, R6, R7, R9, R11, R14: the harness tool pipeline (record_failure / record_suggestion / recommend_deeper_analysis / read_thinker_guide + async mailbox) is replaced by pool files and parallel thinker subagents -->
+---
+name: risks
+description: "Brainstorm failure modes and risks with specialist thinker subagents"
+disable-model-invocation: true
+---
+<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/failure-brainstorming.md — modified per PORTING.md rules R1, R6, R7, R9, R11, R14: the harness tool pipeline (record_failure / record_suggestion / recommend_deeper_analysis / read_thinker_guide + async mailbox) is replaced by pool files and parallel thinker subagents, R16 (packaged as a skill) -->
 
+This pipeline requires a protocol directory with at least a real problem statement — if that's missing, say so and route through Claudity's `start` skill (problem clarification) first. If the brainstorming pool already has pending items, offer failure-analysis instead (the status script's Process Availability section shows which phase is recommended). If the user named a focus area when invoking this skill, honor it; follow the guide below from the beginning.
 # Failure Brainstorming
 
 This process generates raw failure modes through direct analysis, specialist thinker subagents, and human contributions. Raw failures accumulate in a pool until they're ready for analysis and grouping.
@@ -51,7 +57,7 @@ To launch thinkers (Step 4):
 2. Launch each selected thinker via the Agent tool, using the thinker's name as the agent type — **in parallel (one message, multiple Agent calls) when running more than one**. Each prompt must state:
    - the project directory (absolute path) and protocol directory name (`.clarity-protocol/` or `Clarity Protocol/`)
    - the analysis mode: **quick** or **deep**
-   - the absolute path to `<plugin-root>/skills/claudity/processes/failure-reasoning-guidelines.md`
+   - the absolute path to `<plugin-root>/skills/start/processes/failure-reasoning-guidelines.md`
    - for `security-catalog-thinker` only: the absolute path to `<plugin-root>/catalogs/security-catalog.csv`
 3. Each thinker returns structured `## Failures` / `## Suggestions` / `## Specialist recommendations` blocks. Persist its failures by saving the thinker's full returned text to a temp file and running the pool script, which writes one correctly-placed pool file per failure and prints each path:
 
@@ -169,7 +175,7 @@ Summarize what was found:
 - If the user wants to add failures -> stay in this process, capture them, and ask again
 - If the user wants deeper analysis -> apply the specialist lens and return to this step
 - If the user wants failure analysis -> load and follow the **failure-analysis** process guide
-- If the user wants to do something else, or isn't sure -> re-enter the claudity skill main loop
+- If the user wants to do something else, or isn't sure -> re-enter the Claudity router (`start` skill) main loop
 
 After any process completes, the user should never be left wondering what happens next.
 

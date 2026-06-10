@@ -82,7 +82,7 @@ for a complete protocol directory.
 - `/claudity:risks` brainstorms failure modes with specialist thinker subagents
 - `/claudity:message` builds the project narrative and audience-specific messaging
 
-Or just talk: with the plugin enabled, Claude engages the `claudity` skill when
+Or just talk: with the plugin enabled, Claude engages Claudity's router skill when
 you want to explore what to build, clarify requirements, brainstorm risks, or
 make a consequential choice.
 

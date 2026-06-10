@@ -141,4 +141,4 @@ A system that works but can't be deployed, monitored, or debugged isn't finished
 
 ## Next Steps
 
-After architecture design, return to the claudity skill (re-run the status script and reassess) to determine what needs attention next.
+After architecture design, return to the Claudity router — the `start` skill (re-run the status script and reassess) to determine what needs attention next.
