@@ -5,7 +5,7 @@ disable-model-invocation: true
 ---
 <!-- Vendored from microsoft/clarity-agent@6b32c43 processes/decision-guidance.md — modified per PORTING.md rules R1, R10, R16 (packaged as a skill) -->
 
-If there is no protocol directory yet, first scaffold one with `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/protocol_init.py" .` — decisions are recorded in `.clarity-protocol/decisions/`. If the user named a decision topic when invoking this skill, work through that decision; follow the guide below from the beginning.
+If there is no protocol directory yet, first scaffold one with `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/protocol_init.py" .` — decisions are recorded in `.clarity-protocol/decisions/`. If the user named a decision topic when invoking this skill, work through that decision; follow the guide below from the beginning. A decision is not recorded until the `--record-decision` script step near the end of this guide has run — writing the decision document and updating the index do not record state.
 # Decision Guidance
 
 Help the user think through an important decision — one where the choice matters, the tradeoffs are real, and the reasoning should be captured.

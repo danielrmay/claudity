@@ -8,10 +8,10 @@ Vendored for Claudity from microsoft/clarity-agent@6b32c43
 (src/clarity_agent/protocol/initialize.py, MIT License,
 Copyright (c) Microsoft Corporation). Modifications per PORTING.md:
 the protocol-dir resolution is inlined so the file runs standalone;
-the AGENTS.md snippet refresh and mailbox/suggestion-box creation are
-removed (Claudity installs its snippet into CLAUDE.md via the embed
-command, and replaces async mailboxes with parallel subagents); the
-default config identifies Claudity instead of a clarity-agent install.
+the AGENTS.md snippet refresh is removed (Claudity installs its snippet
+into CLAUDE.md via the embed command); ensure_suggestion_box imports
+from the sibling mailbox module; the default config identifies Claudity
+instead of a clarity-agent install.
 
 Template contents are verbatim from upstream — their placeholder text
 must keep matching TEMPLATE_MARKERS in protocol_status.py, which is how
@@ -198,6 +198,12 @@ def init_protocol(project_dir: Path) -> Path:
         full_path: Path = protocol_dir / rel_path
         if not full_path.exists():
             full_path.write_text(content, encoding="utf-8")
+
+    # Create mailbox infrastructure and the suggestion box.
+    (protocol_dir / "mailboxes").mkdir(parents=True, exist_ok=True)
+
+    from mailbox import ensure_suggestion_box
+    ensure_suggestion_box(protocol_dir)
 
     return protocol_dir
 

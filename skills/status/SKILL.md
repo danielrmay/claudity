@@ -3,7 +3,7 @@ name: status
 description: "Show Clarity Protocol status — stale documents, recommended next step, decisions"
 disable-model-invocation: true
 ---
-Run the protocol status script:
+Call the `get_packet_status` MCP tool (from the `clarity-agent` server). If the MCP server is unavailable, the fallback is the status script:
 
 ```bash
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/protocol_status.py" . --agent

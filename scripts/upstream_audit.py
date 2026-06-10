@@ -45,18 +45,14 @@ QUOTED = {"NOTICE.md"}
 # Allowlist: every changed line must match one of these (rule, regex) pairs.
 # Patterns are matched against added OR removed lines from the unified diff.
 ALLOWLIST: list[tuple[str, str]] = [
-    ("R1", r"python -m clarity_agent\.protocol\.packet_status"),
-    ("R1", r"protocol_status\.py"),
-    ("R13", r"python -m clarity_agent\.protocol\.initialize|protocol_init\.py"),
-    ("R6", r"record_failure|pool_add\.py|brainstorm record-failure"),
-    ("R6/R14", r"failures/pool|brainstorming pool|pool script|mailbox"),
-    ("R7", r"record_suggestion|suggestion record|notes\.md.*\[for:|\[for: <phase>\]"),
+    ("R1", r"python -m clarity_agent\.protocol\.(packet_status|initialize|mailbox)"),
+    ("R1", r"(protocol_status|protocol_init|mailbox)\.py"),
+    ("R17", r"record_failure|record_suggestion|record-failure|MCP tool|clarity-agent` server|the mailbox|suggestions mailbox|mailboxes/|failure-brainstorm|brainstorming mailbox|suggestion box"),
     ("R9", r"read_thinker_guide|recommend_deeper_analysis|recommend-deeper|read-thinker-guide|thinker subagent|Agent tool|launch.*thinker|Specialist Thinkers"),
     ("R9", r"subagent|orchestrat|in parallel"),
     ("R10", r"clarity-agent|claudity|Claudity|`start` skill|/claudity:"),
     ("R11", r"CLAUDE_PLUGIN_ROOT|security-catalog\.csv|catalog path|absolute path provided"),
     ("R12", r"<!-- deleted per R12|packet generator|review packet|clarity embed|MCP|mcp\.json|web UI|desktop"),
-    ("R2-R5", r"get_packet_status|write_protocol_document|read_protocol_document|record_decision|check_decision|run_clarity"),
     ("R16", r"SNIPPET-TEMPLATE|disable-model-invocation|^name:|^description:"),
     # R16 packaging blocks (skills/agents): frontmatter, task preamble,
     # metadata carrier, and the standardized output contract (with R9).
@@ -72,10 +68,10 @@ ALLOWLIST: list[tuple[str, str]] = [
     # sections become the standardized structured-output sections.
     ("R9/R16", r"^## (Failures|Suggestions|Specialist recommendations|What to Produce|What Each Failure Record Contains)$"),
     ("R9/R16", r"record a raw failure mode|<what to add or change|^## Output Format$|Every failure must end in actual harm"),
-    ("R2-R5", r"check what you plan to do against the protocol|\{\{PROTOCOL_DIR_NAME\}\}"),
+    ("R17", r"run_clarity|process guide|\{\{PROTOCOL_DIR_NAME\}\}"),
     ("R12", r"dev-tools|Generate threat model artifacts|packet generator"),
     # Structural noise from clean splices: blank lines and bare code fences
-    # left by removed command blocks (the commands themselves match R1/R6/R9).
+    # left by removed command blocks (the commands themselves match R1/R17).
     ("noise", r"^\s*$"),
     ("noise", r"^```(bash|json|markdown)?$"),
 ]
@@ -148,6 +144,13 @@ def main() -> None:
         upstream_text = fetch(up, offline)
         if upstream_text is None:
             print(f"  ?  {local}  (upstream not available; skipped)")
+            continue
+
+        if entry.get("fidelity") == "inlined":
+            short = PIN[:7]
+            ok = local_path.exists() and f"clarity-agent@{short}" in local_path.read_text()
+            print(f"  {'✓' if ok else '✗'}  {local}  (inlines {up}; {'pin header present' if ok else 'MISSING pin header'})")
+            failures += 0 if ok else 1
             continue
 
         if entry.get("fidelity") == "adapted":

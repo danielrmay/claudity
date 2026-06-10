@@ -3,9 +3,9 @@ name: message
 description: "Build the project narrative and audience-specific messaging"
 disable-model-invocation: true
 ---
-<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/message-clarification.md — modified per PORTING.md rules R1, R6, R10, R16 (packaged as a skill) -->
+<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/message-clarification.md — modified per PORTING.md rules R10, R16 (packaged as a skill), R17 -->
 
-This works best when the problem and solution documents have real content — if they're still templates, say so and route through Claudity's `start` skill first. If the user named an audience or messaging focus when invoking this skill, honor it; follow the guide below from the beginning.
+This works best when the problem and solution documents have real content — if they're still templates, say so and route through Claudity's `start` skill first. If the user named an audience or messaging focus when invoking this skill, honor it; follow the guide below from the beginning. The summary is not recorded until it was either written with the `write_protocol_document` tool or recorded via the `--record` script step near the end of this guide — a native file write alone does not record state.
 # Message Clarification
 
 Build the narrative that explains what this project is and why anyone should care — starting with the general story and optionally developing audience-specific versions.
@@ -106,7 +106,7 @@ Structure each audience section:
 
 As you work on messaging, you'll discover things:
 
-- "This audience is going to hate that we do X" — that's a failure mode. Record it with `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/pool_add.py" . message-clarification --title "..."` (description on stdin).
+- "This audience is going to hate that we do X" — that's a failure mode. Record it with the `record_failure` tool (source `message-clarification`).
 - "We can't explain why this is safe because we haven't thought it through" — that's a gap in the solution. Note it.
 - "The story doesn't work because the problem statement is actually wrong" — that's a signal to revisit problem clarification.
 
@@ -140,7 +140,7 @@ This process might naturally lead to:
 
 - **problem-clarification** — If the narrative reveals the problem statement needs work
 - **solution-brainstorming** — If the narrative reveals gaps in the solution
-- **failure-brainstorming** — If audience concerns surface new failure modes (write them to `failures/pool/`)
+- **failure-brainstorming** — If audience concerns surface new failure modes (record them with `record_failure`)
 
 And it's often triggered from:
 

@@ -20,7 +20,7 @@ An AI thinking partner that pushes back, for Claude Code.
 > `snap push` is quietly building an unaudited archive of customer data,
 > copied to a bucket and six laptops.
 
-✨ Real session, abridged — [full transcript](docs/example-session.md). Three
+✨ Real session, abridged — [full transcript](EXAMPLE.md). Three
 turns in, the project has a different shape, a privacy requirement nobody had
 thought about, and all of it written to versionable markdown in the repo.
 
@@ -34,8 +34,9 @@ transcript.
 Claudity is a Claude Code plugin port of Microsoft's
 [Clarity Agent](https://github.com/microsoft/clarity-agent) (MIT), with the
 Python/desktop harness replaced by Claude Code natives: process guides become a
-skill, specialist "thinkers" become subagents, the async mailbox becomes
-parallel subagent calls, and staleness tracking is a small vendored script.
+skill, specialist "thinkers" become subagents, upstream's MCP server runs as a
+vendored zero-dependency server the plugin provides, and staleness tracking is
+a small vendored script.
 The port was performed by AI agents (Claude Code) and is covered by a tiered
 automated test harness plus real-session runs; see [TESTING.md](TESTING.md)
 for exactly what is and isn't verified. Claudity is an independent project.
@@ -68,7 +69,7 @@ It is not affiliated with or endorsed by Microsoft or Anthropic. See
 
 The common path is problem clarification → solution → failure analysis →
 architecture; everything else (discovery, decisions, messaging) is invoked on
-demand. See the [example session](docs/example-session.md) for what the first
+demand. See the [example session](EXAMPLE.md) for what the first
 conversation looks like, and [tests/e2e/fixtures/feature-flags-cli](tests/e2e/fixtures/feature-flags-cli)
 for a complete protocol directory.
 
@@ -92,7 +93,7 @@ The plugin adds about 800 tokens of always-on context per session. Process
 guides load on demand when a phase starts (roughly 2k to 8k tokens each), and
 the failure-brainstorming thinkers run as subagents, which is the main token
 spend; quick mode keeps them bounded. As a reference point, the
-[example session](docs/example-session.md) cost about $2.80 on the largest
+[example session](EXAMPLE.md) cost about $2.80 on the largest
 model over three substantial turns.
 
 Everything Claudity produces is plain files in your repo. Your conversation
@@ -123,7 +124,8 @@ plugin makes no other network calls and collects no telemetry.
 │   ├── architecture.md         # how you plan to build it (with threat model)
 │   └── solution-summary.md     # concise overview for stakeholders
 ├── failures/                   # failure modes, chains, management plans
-│   └── pool/                   # raw brainstormed failures awaiting analysis
+├── mailboxes/                  # raw brainstormed failures and suggestions awaiting review
+├── archive/                    # consumed mailbox snapshots, kept for provenance
 ├── decisions/                  # decision log with criteria and rationale
 └── config.json                 # dependency graph + content hashes (staleness tracking)
 ```

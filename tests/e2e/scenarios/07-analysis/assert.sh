@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
-# Asserts: failure-analysis consumed the pool (snapshot to archive), produced
-# analyzed failure files and a real index, and recorded state.
+# Asserts: failure-analysis consumed the mailbox (snapshot to archive),
+# produced analyzed failure files and a real index, and recorded state.
 set -uo pipefail
 PROJ="$1"; OUT="$2"; REPO="$3"
 source "$(dirname "${BASH_SOURCE[0]}")/../../lib.sh"
 P="$PROJ/.clarity-protocol"
 
-leftover=$(find "$P/failures/pool" -maxdepth 1 -name '*.md' 2>/dev/null | wc -l | tr -d ' ')
-[[ "$leftover" == "0" ]] || fail "$leftover pool file(s) not consumed/archived" || exit 1
+leftover=$(find "$P/mailboxes/failure-brainstorm" -maxdepth 1 -name '[0-9]*.md' 2>/dev/null | wc -l | tr -d ' ')
+[[ "$leftover" == "0" ]] || fail "$leftover mailbox item(s) not consumed/snapshotted" || exit 1
 
-archived=$(find "$P/failures/pool/archive" -name '*--*.md' 2>/dev/null | wc -l | tr -d ' ')
-[[ "$archived" -ge 3 ]] || fail "expected >=3 archived seeds, found $archived" || exit 1
+# The fixture ships one already-consumed snapshot (20260609-000000); the
+# three seeds must land in a NEW snapshot directory.
+archived=$(find "$P/archive/failure-brainstorm" -path '*snapshot-*' -name '*.md' \
+  ! -path '*snapshot-20260609-000000*' 2>/dev/null | wc -l | tr -d ' ')
+[[ "$archived" -ge 3 ]] || fail "expected >=3 newly archived seeds, found $archived" || exit 1
 
 grep -q 'No failure modes have been analyzed yet' "$P/failures/failures.md" \
   && { fail "failures.md still template"; exit 1; }

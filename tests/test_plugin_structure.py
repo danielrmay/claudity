@@ -49,7 +49,7 @@ EXPECTED_AGENTS = {
 NON_PROCESS_GUIDES = {"failure-reasoning-guidelines"}
 
 VENDOR_HEADER = "Vendored from microsoft/clarity-agent@6b32c43"
-FORBIDDEN_RESIDUE = ["python -m clarity_agent", "`run_clarity`", "`read_thinker_guide`"]
+FORBIDDEN_RESIDUE = ["python -m clarity_agent", "`read_thinker_guide`", "pool_add", "failures/pool"]
 
 
 def parse_frontmatter(path: Path) -> dict[str, str]:
@@ -273,6 +273,36 @@ class TestProtocolScaffolding:
 
 
 # -----------------------------------------------------------------------
+# MCP server declaration and tool surface
+# -----------------------------------------------------------------------
+
+class TestMcpServer:
+    EXPECTED_TOOLS = {
+        "run_clarity", "check_decision", "get_packet_status",
+        "read_protocol_document", "write_protocol_document",
+        "record_decision", "record_failure", "record_suggestion",
+    }
+
+    def test_mcp_json_declares_clarity_agent(self) -> None:
+        cfg = json.loads((REPO / ".mcp.json").read_text())
+        assert set(cfg["mcpServers"]) == {"clarity-agent"}
+        server = cfg["mcpServers"]["clarity-agent"]
+        assert server["command"] == "python3"
+        script = server["args"][0].replace("${CLAUDE_PLUGIN_ROOT}", str(REPO))
+        assert Path(script).exists(), f"server script missing: {script}"
+        assert server["env"]["CLAUDITY_PLUGIN_ROOT"] == "${CLAUDE_PLUGIN_ROOT}"
+
+    def test_tool_surface_matches_upstream(self) -> None:
+        from mcp_server import TOOLS
+        assert {t["name"] for t in TOOLS} == self.EXPECTED_TOOLS
+
+    def test_guide_map_targets_exist(self) -> None:
+        from mcp_server import GUIDE_MAP
+        for process, rel in GUIDE_MAP.items():
+            assert (REPO / rel).exists(), f"GUIDE_MAP[{process}] -> missing {rel}"
+
+
+# -----------------------------------------------------------------------
 # Repo hygiene (e2e sessions know the plugin root and can stray into it)
 # -----------------------------------------------------------------------
 
@@ -297,7 +327,11 @@ class TestRepoHygiene:
             "solution/solution-summary.md",
             "decisions/decisions.md", "decisions/decision-01-go-vs-rust.md",
             "failures/failures.md", "failures/failure-01-token-replay.md",
-            "failures/pool/archive/2026-06-09/security-thinker--token-replay.md",
+            "mailboxes/failure-brainstorm/_config.json",
+            "mailboxes/suggestions/_config.json",
+            "archive/failure-brainstorm/_config.json",
+            "archive/failure-brainstorm/snapshot-20260609-000000/20260609-000000-00-token-replay.md",
+            "archive/suggestions/_config.json",
         }
         assert actual == expected, (
             f"unexpected: {sorted(actual - expected)}; missing: {sorted(expected - actual)}"

@@ -51,7 +51,7 @@ porting it here. For a Claudity-only thinker:
 3. **End with the standard `## Output format`** (the `## Failures` /
    `## Suggestions` / `## Specialist recommendations` block structure, copied
    exactly from an existing thinker). The orchestrator parses this and
-   persists failures to `failures/pool/`; your agent only returns text.
+   records failures via `record_failure`; your agent only returns text.
 4. **Register it** in two places: the Specialist Thinkers table in
    `skills/risks/SKILL.md` (the failure-brainstorming guide) (name, lens, required
    prerequisites), and `EXPECTED_AGENTS` in `tests/test_plugin_structure.py`.

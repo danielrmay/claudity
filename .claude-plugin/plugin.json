@@ -1,7 +1,7 @@
 {
   "name": "claudity",
   "displayName": "Claudity",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "An AI thinking partner that pushes back — structured problem clarification, decision guidance, and failure analysis, recorded as plain markdown in your repo. Derived from Microsoft's Clarity Agent.",
   "author": {
     "name": "Daniel May",
