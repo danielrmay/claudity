@@ -37,7 +37,10 @@ Copyright (c) Microsoft Corporation). Modifications per PORTING.md (R17):
 - ``record_decision`` tracks state under the decision file's full stem
   (``decision-NN-<slug>``) instead of upstream's bare number prefix, so
   the tool and the decision-guidance CLI step write the same
-  ``decisionState`` key instead of double-recording.
+  ``decisionState`` key instead of double-recording. It also gains an
+  optional ``related_docs`` parameter (upstream's tool records no
+  grounding): without related docs the staleness engine can never flag
+  the decision for reconsideration.
 """
 
 from __future__ import annotations
@@ -369,6 +372,7 @@ def record_decision(
     rationale: str,
     alternatives: str = "",
     consequences: str = "",
+    related_docs: list[str] | None = None,
     project_dir: str | None = None,
 ) -> str:
     """Record a project decision with structured analysis.
@@ -413,6 +417,7 @@ def record_decision(
             proto_dir,
             decision_id=decision_id,
             status="decided",
+            related_docs=related_docs,
         )
     except Exception as exc:
         return f"Recorded decision: {title} → decisions/{filename} (warning: status tracking failed: {exc})"
@@ -561,6 +566,11 @@ TOOLS: list[dict] = [
                 "rationale": {"type": "string", "description": "Why this option won."},
                 "alternatives": {"type": "string", "description": "Optional: alternatives considered."},
                 "consequences": {"type": "string", "description": "Optional: consequences of the decision."},
+                "related_docs": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Protocol documents whose content grounded this decision, relative to the protocol directory (e.g. ['solution/solution.md', 'goal/requirements.md']). Always pass the documents you consulted: if any of them change later, the decision is flagged for reconsideration — without them it never will be.",
+                },
             },
             ["title", "context", "decision", "rationale"],
         ),

@@ -242,6 +242,24 @@ class TestRecordDecision:
         (key,) = state.keys()
         assert key == "decision-01-use-sqlite", key
 
+    def test_related_docs_ground_the_decision(self, initialized_project: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Claudity R17 deviation: related_docs feeds reconsideration triggers."""
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(initialized_project))
+        from mailbox import protocol_dir
+        from mcp_server import record_decision, write_protocol_document
+        from protocol_status import load_config
+        write_protocol_document("solution/solution.md", "# Solution\n\nA real solution.\n")
+        record_decision(
+            title="Use SQLite",
+            context="Need storage.",
+            decision="SQLite.",
+            rationale="Single node.",
+            related_docs=["solution/solution.md"],
+        )
+        state = load_config(protocol_dir(initialized_project))["decisionState"]
+        entry = state["decision-01-use-sqlite"]
+        assert entry["relatedDocs"].get("solution/solution.md"), entry
+
 
 class TestRecordFailure:
     def test_records_failure(self, initialized_project: Path, monkeypatch: pytest.MonkeyPatch) -> None:
