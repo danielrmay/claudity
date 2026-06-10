@@ -73,6 +73,19 @@ suite fails if a sequential run's total exceeds the budget.
 | 09-message | message-clarification writes a non-template general-audience `summary.md` and records it |
 | 10-record | the headless MCP canary: an ambient risk report lands as exactly one `mailboxes/failure-brainstorm/` item via the `record_failure` tool |
 
+**Plugin isolation.** Sessions never see the real repo: each suite run
+snapshots the plugin payload (working tree minus `.git`/`.venv`/caches) to
+`/tmp/claudity-e2e-plugin.*` and every `claude` invocation gets the snapshot
+as `--plugin-dir`; fanout children inherit the parent's snapshot. At exit the
+suite recomputes the snapshot's sha256 manifest and **fails the run if any
+session mutated the plugin** (the drifted paths are printed; the snapshot is
+kept for inspection). Consequences: editing plugin content mid-run no longer
+invalidates in-flight sessions (they hold the frozen snapshot — though edits
+to the harness scripts themselves still race), and the old stray-session
+hazard is now a deterministic assertion instead of a `git status` warning
+(the repo check remains as defense in depth). The mechanics are covered
+token-free by `tests/test_e2e_isolation.py`.
+
 When iterating on `scripts/mcp_server.py`, remember MCP servers spawn at
 session start — interactive sessions need a restart (or `/reload-plugins`) to
 pick up server edits; `tests/test_mcp_protocol.py` drives a fresh process per

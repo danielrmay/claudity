@@ -28,10 +28,14 @@ the contract before editing anything:
 - Tier 1 (free, run always): `.venv/bin/python -m pytest tests/ -q` plus the
   audit above. Tier 0: `claude plugin validate .`.
 - Tier 2 (paid, local): `tests/e2e/run.sh` — see TESTING.md for model floors
-  and stress mode. **Never modify repo files while a background e2e run is in
-  flight** (sessions read the plugin live; mid-run edits invalidate results).
-- E2e sessions know this repo's path and can stray into it: check `git status`
-  after runs; the manifest tests guard the fixture and showcase packets.
+  and stress mode. Sessions run against a frozen snapshot of the plugin, never
+  this repo, and the suite fails if a session mutates the snapshot — so plugin
+  content edits during a background run are safe, but **don't edit the harness
+  scripts (`tests/e2e/`) mid-run** (run.sh/lib.sh/scenarios execute live from
+  the repo).
+- The manifest tests guard the fixture and showcase packets; if the post-run
+  repo-dirty warning ever fires it means the snapshot indirection leaked —
+  investigate, don't shrug.
 - `scripts/mcp_server.py` edits need a session restart (or `/reload-plugins`)
   to take effect interactively; pytest drives fresh server processes, so tests
   always see current code.
