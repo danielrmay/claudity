@@ -8,7 +8,7 @@ upstream release v0.1.2).
 
 **[`upstream.json`](upstream.json) is the machine-readable source of truth**
 for the pin and the vendored-path watch list. CI enforces that every vendored
-file's header matches its pin and that this file and NOTICE.md carry it. The
+file's header matches its pin and that this file carries it. The
 table below is commentary on the same mapping.
 
 ## Vendoring map
