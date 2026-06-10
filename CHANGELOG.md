@@ -30,14 +30,20 @@ Tracks microsoft/clarity-agent@6b32c43 (upstream v0.1.2).
   `record_failure`, `record_suggestion`) with the tool bodies vendored
   near-verbatim and FastMCP replaced by a hand-rolled stdlib JSON-RPC stdio
   loop — the plugin stays zero-dependency. PORTING.md rule R17 is the
-  vendoring contract. `record_failure`/`record_suggestion` gain an optional
-  `source` parameter so orchestrator-recorded thinker and human findings
-  keep provenance. Platform behavior verified by spike before adoption:
+  vendoring contract. Platform behavior verified by spike before adoption:
   plugin MCP servers work headless (`claude -p`), tools surface as
   `mcp__plugin_claudity_clarity-agent__<tool>`, subagents see plugin MCP
   tools unless restricted by `tools:` frontmatter (thinkers are restricted
   and stay read-only), and `CLAUDE_PROJECT_DIR`/`${CLAUDE_PLUGIN_ROOT}`
   plumb through as documented
+- Three tool-surface extensions beyond upstream — protocol improvements
+  with e2e evidence, documented as upstream proposal candidates in
+  PORTING.md "Server extensions": optional `source` on
+  `record_failure`/`record_suggestion` (thinker/human provenance reaches
+  the recorded documents), optional `related_docs` on `record_decision`
+  (tool-recorded decisions stay grounded for reconsideration triggers),
+  and full-stem `decisionState` keys (the tool and the guide CLI write
+  the same key instead of double-recording)
 - Vendored protocol libraries backing the server: `scripts/mailbox.py`
   (upstream mailbox module + CLI, near-verbatim), `scripts/brainstorm.py`
   and `scripts/suggestion.py` (recording paths; LLM-dispatch surface
@@ -146,11 +152,8 @@ Tracks microsoft/clarity-agent@6b32c43 (upstream v0.1.2).
     03-decide joins the Sonnet model floor and the decide preamble states
     that writing the document does not record state
   - `record_decision` inherited two upstream tool warts that broke
-    grounding: it keyed `decisionState` by bare number (double-recording
-    against the guide CLI's `decision-NN-<slug>` ids) and recorded no
-    related docs (tool-recorded decisions could never fire
-    reconsideration triggers) — fixed by full-stem keys and an optional
-    `related_docs` parameter
+    grounding (bare-number `decisionState` keys, no related docs) —
+    fixed by the tool-surface extensions listed under Added
 
 
 

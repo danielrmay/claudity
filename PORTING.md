@@ -27,7 +27,40 @@ Each vendored markdown file starts with a header comment:
 | R11 | Paths to `skills/risks/security-catalog.csv` or other plugin files inside thinker/process text | The orchestrator resolves the absolute path under `${CLAUDE_PLUGIN_ROOT}` and injects it into the subagent prompt (env vars are not expanded inside agent bodies) |
 | R12 | Instructions specific to the Clarity UI, transcripts, docx/packet export, installer, or per-project MCP configuration (`.vscode/mcp.json`, `clarity embed`) | Deleted or replaced with "the Claudity plugin provides these tools" wording; deletions marked `<!-- deleted per R12: ... -->` |
 | R16 | Vendored units that ARE a Claude Code component: guides/templates with a 1:1 user entry (decision-guidance, failure-brainstorming, message-clarification, the agent snippet) and the six thinkers | Packaged as skills/agents: Claude Code frontmatter, a short task preamble, a `## Metadata` block carrying the upstream frontmatter fields, and (thinkers) the standardized `## Output format` contract replacing upstream's tool instructions (with R9); the vendored methodology text remains governed by the other rules. (R15 is retired — see CHANGELOG.) |
-| R17 | The upstream MCP server (`src/clarity_agent/mcp/server.py`, FastMCP) and tool invocations in guide text (MCP tool references and `python -m clarity_agent.ai_actions.*` CLI blocks) | The vendored stdlib server `scripts/mcp_server.py`, declared in the plugin's `.mcp.json` as the `clarity-agent` server, exposing the same 8 tools. Guide text invokes the tools by their upstream names (`record_failure`, `record_suggestion`, `run_clarity`, …). Server adaptations (each noted in its docstring): FastMCP → hand-rolled stdlib JSON-RPC stdio loop; `CLARITY_PROJECT_DIR` → `CLAUDE_PROJECT_DIR` (compat fallback kept); agent-dir → plugin layout via `CLAUDITY_PLUGIN_ROOT` + a guide map; served guide text gets frontmatter stripped and `${CLAUDE_PLUGIN_ROOT}` substituted; upstream's internal (non-tool) functions and 6 MCP resources descoped; `record_failure`/`record_suggestion` gain an optional `source` parameter so orchestrator-recorded findings keep thinker/human provenance; `record_decision` keys `decisionState` by the decision file's full stem so the tool and the guide CLI never double-record, and gains an optional `related_docs` parameter so tool-recorded decisions stay grounded for reconsideration triggers |
+| R17 | The upstream MCP server (`src/clarity_agent/mcp/server.py`, FastMCP) and tool invocations in guide text (MCP tool references and `python -m clarity_agent.ai_actions.*` CLI blocks) | The vendored stdlib server `scripts/mcp_server.py`, declared in the plugin's `.mcp.json` as the `clarity-agent` server, exposing the same 8 tools. Guide text invokes the tools by their upstream names (`record_failure`, `record_suggestion`, `run_clarity`, …). Server adaptations (each noted in its docstring): FastMCP → hand-rolled stdlib JSON-RPC stdio loop; `CLARITY_PROJECT_DIR` → `CLAUDE_PROJECT_DIR` (compat fallback kept); agent-dir → plugin layout via `CLAUDITY_PLUGIN_ROOT` + a guide map; served guide text gets frontmatter stripped and `${CLAUDE_PLUGIN_ROOT}` substituted; upstream's internal (non-tool) functions descoped (no Claude Code consumer). The tool-surface extensions live in their own section below — they are protocol improvements, not porting substitutions |
+
+### Transport: stdio shim, not FastMCP
+
+Upstream's server runs on FastMCP, which requires the `mcp` package (plus
+pydantic) installed in the user's Python — a dependency the plugin cannot
+install, breaking Claudity's python3-stdlib-only contract. A FastMCP vendor
+would not be a straight vendor anyway: every R17 adaptation (import
+redirection, project/agent-dir resolution, guide serving) applies
+identically; the only delta is ~200 lines of hand-rolled JSON-RPC stdio
+transport at the bottom of `scripts/mcp_server.py`, covered by
+`tests/test_mcp_protocol.py`. Revisit if Claude Code plugins gain dependency
+management or upstream ships a stdlib transport.
+
+### Server extensions (upstream candidates)
+
+Three additions to the upstream tool surface. They are deliberate protocol
+improvements with e2e evidence behind them, not porting substitutions, and
+are candidates for proposing upstream per CONTRIBUTING's upstream-first
+policy (each is also flagged in the server docstring):
+
+- **`source` on `record_failure`/`record_suggestion`** (upstream hardcodes
+  `source="mcp"`). The orchestrator records on behalf of thinker subagents
+  and human contributors, so provenance must travel through the tool call;
+  upstream's own guides assume a source can be stated, and the failure
+  documents carry `**Source:**` lines that analysis reads.
+- **`related_docs` on `record_decision`** (upstream's tool records no
+  grounding). Without related docs the staleness engine can never flag a
+  tool-recorded decision for reconsideration — e2e caught a pure-MCP decide
+  session producing a permanently trigger-less decision.
+- **Full-stem `decisionState` keys** (upstream extracts only the number
+  prefix). Upstream's tool and its own decision-guidance CLI disagree on id
+  format; a session that used both double-recorded under `02` and
+  `decision-02-<slug>`. The tool now writes the same key the CLI does.
 
 ### Retired rules
 

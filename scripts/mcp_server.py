@@ -24,23 +24,25 @@ Copyright (c) Microsoft Corporation). Modifications per PORTING.md (R17):
   tool results.
 - The clarity_agent package imports become sibling-module imports
   (protocol_status, brainstorm, suggestion, mailbox).
-- Upstream's internal (non-tool) functions and the six MCP resources are
-  descoped: every resource duplicates content natively reachable in
-  Claude Code (protocol docs via the Read tool, process guides are skill
-  bodies, thinker guides are agents), and ``clarity://behaviors`` depends
-  on the AGENTS.md machinery Claudity replaces with the embed skill.
-- ``record_failure`` / ``record_suggestion`` gain an optional ``source``
-  parameter (upstream's MCP signatures hardcode source="mcp"). Claudity's
-  orchestrator records on behalf of thinker subagents and human
-  contributors, so provenance must travel through the tool call —
-  upstream preserved it via per-thinker mailbox writers instead.
+- Upstream's internal (non-tool) functions are descoped (no Claude Code
+  consumer).
+
+Extensions beyond upstream's tool surface — protocol improvements, not
+porting substitutions; upstream proposal candidates (PORTING.md "Server
+extensions"):
+
+- ``record_failure`` / ``record_suggestion`` accept an optional ``source``
+  (upstream hardcodes source="mcp"): the orchestrator records on behalf
+  of thinker subagents and human contributors, so provenance must travel
+  through the tool call — upstream preserved it via per-thinker mailbox
+  writers instead.
+- ``record_decision`` accepts an optional ``related_docs`` (upstream's
+  tool records no grounding): without related docs the staleness engine
+  can never flag the decision for reconsideration.
 - ``record_decision`` tracks state under the decision file's full stem
   (``decision-NN-<slug>``) instead of upstream's bare number prefix, so
   the tool and the decision-guidance CLI step write the same
-  ``decisionState`` key instead of double-recording. It also gains an
-  optional ``related_docs`` parameter (upstream's tool records no
-  grounding): without related docs the staleness engine can never flag
-  the decision for reconsideration.
+  ``decisionState`` key instead of double-recording.
 """
 
 from __future__ import annotations
