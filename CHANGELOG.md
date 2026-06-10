@@ -98,6 +98,8 @@ Tracks microsoft/clarity-agent@6b32c43 (upstream v0.1.2).
   for failure recording is restored in its original form
 - The fixture packet and its CLAUDE.md re-rendered for the mailbox layout
   and new snippet; e2e 04/07 assert mailbox artifacts
+- The real-session transcript moved from docs/example-session.md to
+  EXAMPLE.md at the repo root (docs/ held nothing else)
 
 
 - All e2e scenario prompts enter through real product surfaces (the claudity
@@ -167,7 +169,7 @@ Tracks microsoft/clarity-agent@6b32c43 (upstream v0.1.2).
 ### Removed
 
 - The experimental README warning, following the isolated real-session
-  validation on Fable 5 (docs/example-session.md) on top of the automated
+  validation on Fable 5 (EXAMPLE.md, then docs/example-session.md) on top of the automated
   harness. AI-port provenance and the verification scope remain disclosed in
   the README intro and TESTING.md.
 
@@ -179,7 +181,7 @@ Tracks microsoft/clarity-agent@6b32c43 (upstream v0.1.2).
 
 - New-user onboarding: README quickstart, prerequisites, cost and privacy
   notes, uninstall instructions, and a real example session transcript
-  (docs/example-session.md, recorded on Fable 5)
+  (EXAMPLE.md, then docs/example-session.md, recorded on Fable 5)
 - Contributor docs: CONTRIBUTING.md (upstream-first policy, adding-a-thinker
   recipe), code of conduct, issue and PR templates
 

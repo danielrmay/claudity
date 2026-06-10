@@ -2,7 +2,7 @@
 
 A real `.clarity-protocol/` packet produced by Claudity in a genuine
 three-turn session (Sonnet), following the same conversation script as the
-[example session transcript](../../docs/example-session.md). Model outputs
+[example session transcript](../../EXAMPLE.md). Model outputs
 vary run to run, so wording here differs from the quoted transcript — but
 the artifacts are authentic: nothing was hand-edited.
 
