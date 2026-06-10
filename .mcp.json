@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "clarity-agent": {
+      "command": "python3",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/mcp_server.py"],
+      "env": {
+        "CLAUDITY_PLUGIN_ROOT": "${CLAUDE_PLUGIN_ROOT}",
+        "PYTHONUNBUFFERED": "1"
+      }
+    }
+  }
+}
