@@ -17,3 +17,7 @@ Run the status script against it:
 ```bash
 python3 ../../scripts/protocol_status.py .
 ```
+
+The `CLAUDE.md` alongside the packet is the snippet `/claudity:embed`
+installs — included because every real embedded project carries it (the e2e
+fixture relies on it for ambient skill engagement).

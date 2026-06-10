@@ -1,4 +1,4 @@
-<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/failure-management.md — modified per PORTING.md rules R1, R6, R10, R15 -->
+<!-- Vendored from microsoft/clarity-agent@6b32c43 processes/failure-management.md — modified per PORTING.md rules R1, R6, R10 -->
 
 # Failure Management
 
@@ -310,10 +310,6 @@ After writing, record document state for the files you updated. Always include `
 ```bash
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/protocol_status.py" . --record failures/failures.md [other updated docs]
 ```
-
-<!-- claudity: R15 -->
-This recording step is required — the process is not complete without it. Never edit `config.json` by hand; `documentState` and `decisionState` are managed only by the status script.
-<!-- /claudity: R15 -->
 
 ## Success Indicators
 

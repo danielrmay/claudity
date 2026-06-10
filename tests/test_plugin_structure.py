@@ -231,6 +231,13 @@ class TestProtocolScaffolding:
         assert "<!-- claudity-end -->" in snippet
         assert snippet.count("{{PROTOCOL_DIR_NAME}}") >= 2
 
+    def test_sessionstart_hook(self) -> None:
+        """The hook single-sources the plugin-root fact into session context."""
+        hooks = json.loads((REPO / "hooks" / "hooks.json").read_text())
+        entries = hooks["hooks"]["SessionStart"]
+        commands = [h["command"] for e in entries for h in e["hooks"]]
+        assert any("CLAUDE_PLUGIN_ROOT" in c for c in commands)
+
     def test_snippet_is_portable(self) -> None:
         """The snippet is copied into user projects' CLAUDE.md, where
         ${CLAUDE_PLUGIN_ROOT} is not defined — it must route through the
@@ -295,7 +302,9 @@ class TestUpstreamPin:
             for p in repo_markdown_files()
             if "clarity-agent@" in p.read_text()
             and str(p.relative_to(REPO)) not in watched | rewrites | self.HEADER_EXEMPT
-            and not str(p.relative_to(REPO)).startswith(("PORTING", "UPSTREAM", "README", "TESTING", "CHANGELOG"))
+            # examples/ holds rendered artifacts of watched files (e.g. the
+            # embedded CLAUDE.md rendered from the snippet), not vendoring units
+            and not str(p.relative_to(REPO)).startswith(("PORTING", "UPSTREAM", "README", "TESTING", "CHANGELOG", "examples/"))
         ]
         assert not unwatched, f"files with vendor headers not in upstream.json watch set: {unwatched}"
 

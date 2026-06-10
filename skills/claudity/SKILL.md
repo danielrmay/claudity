@@ -74,8 +74,8 @@ That's a sensible default, not a rule — if the user wants to work on something
 Once you know what to work on:
 
 1. Tell the user what you suggest and why.
-2. Read the process guide from `${CLAUDE_PLUGIN_ROOT}/skills/claudity/processes/<name>.md` and follow it from its beginning. Process guides contain specific steps and pipelines that must be followed — don't attempt the task freehand. Re-read a guide only when switching processes, not on every turn.
-3. The guides reference plugin scripts via a `CLAUDE_PLUGIN_ROOT` placeholder. That variable is **not set in the Bash environment** — when running a guide's commands, substitute the plugin root's absolute path yourself (it is the prefix of the guide's own file path, before `skills/claudity/`). Never run a command containing the unexpanded placeholder, and never pipe these commands through `tail`/`head` in a way that hides their errors.
+2. Read the process guide from `${CLAUDE_PLUGIN_ROOT}/skills/claudity/processes/<name>.md` and follow it from its beginning. **Never run a process from memory:** if you have not Read the named guide in this session, read it before doing any process work — the guides contain required pipeline steps (pool snapshots, scripts to run, state recording) that freehand work will miss, leaving the packet silently inconsistent. Re-read a guide only when switching processes, not on every turn.
+3. The guides reference plugin scripts via a `CLAUDE_PLUGIN_ROOT` placeholder that is **not set in the Bash environment** — substitute the absolute plugin root (provided in your session context at startup, and visible as this skill's own path prefix). Never run a command containing the unexpanded placeholder, and don't pipe these commands through `tail`/`head` in ways that hide their errors.
 
 **After any process completes, return here**: re-run the status script, see what changed, and guide the user to the next useful thing. Never leave them in silence wondering what happens next.
 

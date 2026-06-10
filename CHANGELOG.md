@@ -9,17 +9,34 @@ the upstream pin it tracks).
 
 ### Added
 
+- e2e v2: scenarios are scripted multi-turn persona conversations (verbatim
+  user messages via `claude -p --resume`, acceptance as a real user turn)
+  instead of single prompts with stage directions; `--parallel` suite mode
+  and `--stress <scenario> <n>` pass-rate mode; per-scenario model floors
+  (ambient conversational scenarios test on Sonnet: measured 4/4 vs 2/6 on
+  Haiku, which engages the skill then freestyles past the guide)
+- SessionStart hook injects the resolved plugin root into session context,
+  single-sourcing the CLAUDE_PLUGIN_ROOT substitution rule (the variable is
+  never set in Bash); duplicated notes removed from commands
+- The example packet now includes the embedded CLAUDE.md snippet, as every
+  real embedded project has
+
 - e2e scenarios 05-09 covering solution-brainstorming, architecture-design,
   failure-analysis, failure-management, and message-clarification; the full
-  behavioral suite is now 9 scenarios (~$1 on Haiku)
-- PORTING.md rule R15 (additive reliability clarifications): explicit
-  record-state steps and a "never hand-edit config.json" guard in the
-  failure-analysis and failure-management guides, after the harness caught a
-  model inventing its own config bookkeeping
+  behavioral suite is now 9 scenarios
 - `scripts/pool_add.py`: deterministic pool recording (one correctly-placed
-  file per failure), replacing hand-written pool files in all guides. The
-  harness showed models repeatedly misplacing hand-written pool files —
-  re-learning upstream's reason for making `record_failure` a tool
+  file per failure), replacing hand-written pool files in all guides —
+  restoring upstream's tool-based design for `record_failure`
+
+### Reverted
+
+- The short-lived R15 guide insertions (explicit record-state steps in
+  failure-analysis and failure-management) and PORTING.md rule R15 itself.
+  A controlled experiment (entry surfaces now guarantee guide-reading)
+  showed guide-reading sessions record state correctly on upstream's
+  original wording — the insertions fixed a misdiagnosed cause, and
+  upstream's text is exonerated. The freestyle failure mode is addressed
+  where it belongs, in SKILL.md ("never run a process from memory").
 
 ### Changed
 

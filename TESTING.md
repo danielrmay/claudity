@@ -10,7 +10,7 @@ small headless smoke suite with a hard cost budget, run locally on demand.
 | ---- | ---- | ---- | ---- |
 | 0 | `claude plugin validate .` + component inventory (`claude --plugin-dir . plugin details claudity`) | free | CI, every push |
 | 1 | `pytest tests/` — 71 vendored status-engine tests + structural tests (manifests, frontmatter, cross-reference integrity, porting lints, init↔staleness coupling) | free | CI, every push |
-| 2 | `e2e/run.sh` — 9 headless scenarios with deterministic artifact assertions | ~$1 on Haiku | locally, before a release or after touching SKILL.md / processes / commands / agents |
+| 2 | `e2e/run.sh` — 9 headless scenarios with deterministic artifact assertions | ~$2.50 (mixed Haiku/Sonnet floors) | locally, before a release or after touching SKILL.md / processes / commands / agents |
 
 ## Tier 1
 
@@ -30,25 +30,35 @@ Tests that shell out to `claude` are skipped when the CLI isn't on PATH.
 ## Tier 2
 
 ```bash
-e2e/run.sh          # all scenarios
-e2e/run.sh 01       # one scenario by prefix
+e2e/run.sh                  # all scenarios, sequential
+e2e/run.sh 01               # one scenario by prefix
+e2e/run.sh --parallel       # all scenarios concurrently
+e2e/run.sh --stress 07 6    # 6 parallel copies of one scenario; pass rate
 ```
 
-Each scenario runs `claude -p` in a throwaway project with the plugin loaded
-via `--plugin-dir` (nothing is installed into your real config), then asserts
-on **artifacts** — files created, `config.json` state, status-script output —
-never on LLM-judged transcripts. Scenario prompts must enter through real
-product surfaces (a `/claudity:*` command or the skill): a prompt that says
-"read the guide" without a path tests a phantom entry that no user docs
-suggest, and the model may never find the guide. Transcript forensics across
-five sessions showed this cleanly — every session that hand-invented config
-bookkeeping had failed to find the guide, and every session that read the
-guide recorded state correctly. Worse, a model that can't find the guide
-improvises something plausible instead of stopping, which can slip past
-asserts that don't check recording (08-management did exactly this twice
-before its assert was tightened). A per-scenario cost table is printed from
-the CLI's `total_cost_usd`, and the suite fails if the total exceeds the
-budget.
+A scenario is a **scripted persona conversation** plus deterministic
+assertions. Each `turns/NN.md` is a verbatim-plausible user message (a slash
+command, an answer, an explicit acceptance) played into one headless session
+(`claude -p`, then `claude -p --resume`) in a throwaway project with the
+plugin loaded via `--plugin-dir`. There are no stage directions for the model
+to interpret — acceptance is a real user turn, which is what makes the
+record-on-acceptance rule honestly testable. Asserts check **artifacts**
+(files created, `config.json` state, status-script output), never LLM-judged
+transcripts; where an answer must be checked (02-routing), the oracle is
+computed from the status engine's own output rather than hardcoded.
+
+The nondeterminism stance, explicitly: the **user side is pinned** by the
+script, the **model side is deliberately free** (its interpretation of the
+process guides is the thing under test), and the **oracle is deterministic**.
+Scenario openers must enter through real product surfaces (a `/claudity:*`
+command, or natural language that engages the skill in a project carrying the
+embedded CLAUDE.md snippet — the fixture includes one, as every real embedded
+project does). Transcript forensics earlier showed why: sessions that never
+found a guide improvised plausible-but-wrong bookkeeping instead of stopping,
+and slipped past asserts that didn't check recording.
+
+A per-scenario cost table is printed from the CLI's `total_cost_usd`; the
+suite fails if a sequential run's total exceeds the budget.
 
 | Scenario | Verifies |
 | -------- | -------- |
@@ -66,17 +76,23 @@ Discovery (`discovery-research` / `discovery-prototype`) remains uncovered:
 their outputs are investigation programs and disposable prototypes with no
 cheap deterministic artifact contract.
 
+**Model floors.** Command-anchored scenarios (01–04, 09) run on Haiku — the
+cheapest and most demanding test of those surfaces. Ambient skill-driven
+conversational scenarios (05–08) set `MODEL_FLOOR="sonnet"` in their
+`config.sh`: measured on this suite, natural-language openers drove the full
+pipeline reliably on Sonnet (4/4 stress on 07) but degraded on Haiku (2/6 —
+it engages the skill, then freestyles past "read the process guide"). That
+matches real usage: nobody runs design conversations on Haiku, and the README
+already steers users toward frontier models. An explicit `CLAUDITY_TEST_MODEL`
+overrides floors everywhere.
+
 Environment variables:
 
-- `CLAUDITY_TEST_MODEL` — model for runs (default `haiku`). Haiku is the
-  default on purpose: it's the cheapest and the most demanding test of the
-  guides — if Haiku can follow them, larger models will. In practice Haiku
-  failures have mostly exposed real guide ambiguities (e.g. it wrote
-  brainstormed failures into `failures/` and then `pool/archive/` until the
-  guide explicitly forbade both). Re-run a failure once on `sonnet`: if
-  Sonnet passes, treat it as a guide-clarity bug, not a flake.
-- `CLAUDITY_MAX_COST_USD` — budget for a full run (default `1.50`)
+- `CLAUDITY_TEST_MODEL` — force one model for all runs (default: `haiku`,
+  with per-scenario floors as above)
+- `CLAUDITY_MAX_COST_USD` — budget for a sequential full run (default `3.00`)
 - `CLAUDITY_SKIP_THINKER=1` — skip 04-thinker (the most expensive scenario)
+- `CLAUDITY_E2E_KEEP=1` — keep scratch projects/artifacts even on pass
 
 Tier 2 runs on whatever `claude` auth is active locally and is therefore not
 wired into CI. Scenario artifacts (result JSON + stderr per run) land in a

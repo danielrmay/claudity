@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"Claudity plugin root: ${CLAUDE_PLUGIN_ROOT} — Claudity's process guides reference plugin scripts via a CLAUDE_PLUGIN_ROOT placeholder that is NOT set in the Bash environment; substitute this absolute path when running those commands.\""
+          }
+        ]
+      }
+    ]
+  }
+}

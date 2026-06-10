@@ -40,6 +40,12 @@
         "goal/requirements.md": "1460eb150aa193d049940f94adc5799e4548279d3bdb9b7167d2a4239c5eb9a3",
         "goal/open-questions.md": "19668c6e7db0e7e71a1eb4c294668e35f44823f474968638048f6acb7d7646c4"
       }
+    },
+    "failures/failures.md": {
+      "contentHash": "a60f6edf9baf5edff26b63662751daca4210b84dfb2df44529089130617432dc",
+      "dependencyHashes": {
+        "solution/solution.md": "35ddba1aa5fd62fada2cc09b47b3c45c015112a4db39b2209335f1e5902a6006"
+      }
     }
   },
   "decisionState": {

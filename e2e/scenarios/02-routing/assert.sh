@@ -1,20 +1,24 @@
 #!/usr/bin/env bash
-# Asserts: the model ran the status command and correctly relayed the
-# recommended next process for the fixture packet (failures.md is the first
-# non-current doc; with an analyzed+managed failure and an empty pool, the
-# correct phase is failure-brainstorming).
+# Asserts: the model ran the status command and relayed a process the status
+# engine actually recommends for this packet. The oracle is computed from the
+# engine's own output (graph-walk next action + processAvailability
+# "recommended" entries), not a hardcoded expectation — for this fixture the
+# engine genuinely recommends more than one process.
 set -uo pipefail
 PROJ="$1"; OUT="$2"; REPO="$3"
 source "$(dirname "${BASH_SOURCE[0]}")/../../lib.sh"
 
 text="$(result_text "$OUT")"
-line="$(grep -E '^RECOMMENDED:' <<<"$text" | tail -1)"
-if [[ -n "$line" ]]; then
-  grep -q 'failure-brainstorming' <<<"$line" || fail "expected failure-brainstorming, got: $line" || exit 1
-else
-  # Small models sometimes drop the strict format line while still relaying
-  # the right recommendation — accept correct behavior over correct format.
-  grep -q 'failure-brainstorming' <<<"$text" \
-    || fail "result doesn't relay failure-brainstorming: $(tail -c 300 <<<"$text")" || exit 1
-fi
-exit 0
+allowed="$(packet_json "$PROJ" | python3 -c '
+import json, sys
+r = json.load(sys.stdin)
+names = {p["process"] for p in r["processAvailability"] if p["status"] == "recommended"}
+print("\n".join(sorted(names)))
+')"
+[[ -n "$allowed" ]] || fail "oracle error: engine recommends nothing for this packet" || exit 1
+
+for name in $allowed; do
+  if grep -q "$name" <<<"$text"; then exit 0; fi
+done
+fail "result relays none of the engine's recommendations ($(tr '\n' ' ' <<<"$allowed")): $(tail -c 300 <<<"$text")"
+exit 1

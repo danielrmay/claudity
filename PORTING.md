@@ -32,7 +32,6 @@ Each vendored markdown file starts with a header comment:
 | R12 | Instructions specific to the Clarity UI, transcripts, docx/packet export, or installer | Deleted, with an HTML comment `<!-- deleted per R12: ... -->` marking the spot |
 | R13 | `python -m clarity_agent.protocol.initialize <dir>` | `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/protocol_init.py" <project_dir>` via Bash |
 | R14 | `python -m clarity_agent.protocol.mailbox snapshot/write ...` | Move processed pool files to `failures/pool/archive/<YYYY-MM-DD>/`; write new raw failures as plain files in `failures/pool/` |
-| R15 | (Additive) Reliability clarifications for model guide-following, discovered via the e2e harness: imperative recording steps, file-location guards, "never hand-edit config.json" | Inserted text marked `<!-- claudity: R15 -->`; must not alter upstream methodology, only make existing obligations explicit |
 
 ## Vendored Python and tests
 

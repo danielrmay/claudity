@@ -17,20 +17,45 @@ new_project() {
   echo "$dir"
 }
 
-# run_claude <project_dir> <prompt_file> <max_turns> <result_json_out>
-# Headless run with the plugin loaded from the repo. Never fails the shell;
-# callers inspect the JSON and artifacts.
-run_claude() {
-  local proj="$1" prompt_file="$2" turns="$3" out="$4"
-  (
-    cd "$proj" || exit 1
-    claude -p "$(cat "$prompt_file")" \
-      --plugin-dir "$REPO" \
-      --model "$MODEL" \
-      --max-turns "$turns" \
-      --permission-mode bypassPermissions \
-      --output-format json
-  ) > "$out" 2> "${out%.json}.stderr" || true
+# run_conversation <project_dir> <scenario_dir> <max_turns> <out_json>
+# Scripted multi-turn persona: plays each turns/NN.md as a user message in
+# one headless session (first via -p, then -p --resume). <out_json> ends up
+# holding the LAST turn's result JSON, with scenario-total cost merged in as
+# total_cost_usd; per-turn JSON is kept alongside as <out>.turn-N.json.
+# Never fails the shell; callers inspect the JSON and artifacts.
+run_conversation() {
+  local proj="$1" scenario="$2" turns_cap="$3" out="$4"
+  local session_id="" n=0 turn_out total=0
+  for turn_file in "$scenario"/turns/*.md; do
+    n=$((n + 1))
+    turn_out="${out%.json}.turn-$n.json"
+    (
+      cd "$proj" || exit 1
+      if [[ -z "$session_id" ]]; then
+        claude -p "$(cat "$turn_file")" \
+          --plugin-dir "$REPO" --model "${SCENARIO_MODEL:-$MODEL}" --max-turns "$turns_cap" \
+          --permission-mode bypassPermissions --output-format json
+      else
+        claude -p --resume "$session_id" "$(cat "$turn_file")" \
+          --plugin-dir "$REPO" --model "${SCENARIO_MODEL:-$MODEL}" --max-turns "$turns_cap" \
+          --permission-mode bypassPermissions --output-format json
+      fi
+    ) > "$turn_out" 2> "${turn_out%.json}.stderr" || true
+    [[ -z "$session_id" ]] && session_id="$(json_field "$turn_out" session_id)"
+    cost="$(json_field "$turn_out" total_cost_usd)"; [[ -z "$cost" ]] && cost=0
+    total=$(python3 -c "print(round($total + $cost, 6))")
+  done
+  # Final JSON = last turn's, with the conversation-total cost.
+  python3 - "$turn_out" "$out" "$total" <<'PYEOF'
+import json, sys
+src, dst, total = sys.argv[1], sys.argv[2], float(sys.argv[3])
+try:
+    d = json.load(open(src))
+except Exception:
+    d = {}
+d["total_cost_usd"] = total
+json.dump(d, open(dst, "w"))
+PYEOF
 }
 
 # json_field <file> <key> — top-level string/number field, empty if absent.
