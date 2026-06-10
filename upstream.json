@@ -37,7 +37,8 @@
     },
     {
       "upstream": "processes/failure-brainstorming.md",
-      "local": "skills/risks/SKILL.md"
+      "local": "skills/risks/SKILL.md",
+      "fidelity": "adapted"
     },
     {
       "upstream": "processes/failure-analysis.md",

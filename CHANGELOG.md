@@ -21,6 +21,11 @@ the upstream pin it tracks).
 
 ### Added
 
+- `scripts/upstream_audit.py` (CI-enforced): fetches the pinned upstream and
+  verifies every changed line in every vendored file traces to a PORTING.md
+  rule; verbatim entries byte-checked. First run surfaced and fixed one
+  uncited deviation (the snippet's R12 trim) and led to R16 being extended
+  to cover the thinker-agent packaging
 - e2e v2: scenarios are scripted multi-turn persona conversations (verbatim
   user messages via `claude -p --resume`, acceptance as a real user turn)
   instead of single prompts with stage directions; `--parallel` suite mode

@@ -29,7 +29,7 @@ schema_version: 1
 protocol_dir_name: {{PROTOCOL_DIR_NAME}}
 -->
 <!-- Claudity manages this block; edits between the claudity-begin / claudity-end markers will be overwritten when the snippet is refreshed. Put project-specific guidance outside the markers. -->
-<!-- Vendored from microsoft/clarity-agent@6b32c43 src/clarity_agent/setup/snippet.md — modified per PORTING.md rules R2, R3, R4, R5, R6, R10, R16 (MCP tools → Claudity skills and file operations; template inlined in the embed skill) -->
+<!-- Vendored from microsoft/clarity-agent@6b32c43 src/clarity_agent/setup/snippet.md — modified per PORTING.md rules R2, R3, R4, R5, R6, R10, R12, R16 (MCP tools → Claudity skills and file operations; packet-generator/system-design references trimmed; template inlined in the embed skill) -->
 
 ## Clarity Protocol
 

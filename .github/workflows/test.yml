@@ -16,6 +16,8 @@ jobs:
           python-version: "3.12"
       - run: pip install pytest pyyaml
       - run: pytest tests/ -q
+      - name: Vendored-fidelity audit (every deviation traces to a PORTING rule)
+        run: python3 scripts/upstream_audit.py
 
   plugin-validate:
     name: "Tier 0: plugin manifest + inventory"

@@ -32,7 +32,7 @@ Each vendored markdown file starts with a header comment:
 | R12 | Instructions specific to the Clarity UI, transcripts, docx/packet export, or installer | Deleted, with an HTML comment `<!-- deleted per R12: ... -->` marking the spot |
 | R13 | `python -m clarity_agent.protocol.initialize <dir>` | `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/protocol_init.py" <project_dir>` via Bash |
 | R14 | `python -m clarity_agent.protocol.mailbox snapshot/write ...` | Move processed pool files to `failures/pool/archive/<YYYY-MM-DD>/`; write new raw failures as plain files in `failures/pool/` |
-| R16 | Guides/templates with a 1:1 user entry surface (decision-guidance, failure-brainstorming, message-clarification, the agent snippet) | Packaged as skills: Claude Code frontmatter and a short preamble prepended above the vendor header; the vendored text itself remains governed by the other rules. (R15 is retired — see CHANGELOG.) |
+| R16 | Vendored units that ARE a Claude Code component: guides/templates with a 1:1 user entry (decision-guidance, failure-brainstorming, message-clarification, the agent snippet) and the six thinkers | Packaged as skills/agents: Claude Code frontmatter, a short task preamble, a `## Metadata` block carrying the upstream frontmatter fields, and (thinkers) the standardized `## Output format` contract replacing upstream's tool instructions (with R9); the vendored methodology text remains governed by the other rules. (R15 is retired — see CHANGELOG.) |
 
 ## Vendored Python and tests
 

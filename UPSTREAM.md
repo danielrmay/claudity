@@ -82,6 +82,19 @@ the new version with the upstream pin it tracks, then run
 `claude plugin tag` (creates a validated `claudity--vX.Y.Z` git tag) and push
 the tag.
 
+## Fidelity audit
+
+`python3 scripts/upstream_audit.py` (runs in CI) is the confidence check for
+the verbatim claim: it fetches the pinned upstream text for every watch
+entry, strips Claudity packaging (frontmatter, vendor header, R16 preamble;
+the embed skill's fenced snippet template is extracted), and classifies every
+remaining changed line against patterns keyed to PORTING.md rule IDs.
+Unexplained lines fail the build. Verbatim entries (the security catalog, the
+upstream router reference copy) must be byte-identical; entries marked
+`"fidelity": "adapted"` in upstream.json (failure-brainstorming) and the
+Python/test files are reported informationally — their contracts are their
+header notes and docstrings.
+
 ## Re-sync procedure
 
 1. Pick the new upstream commit `NEW_SHA`; fetch each upstream file in the map:
@@ -95,7 +108,12 @@ the tag.
 4. For `SKILL.md`/`routing.md`, diff the new `clarity-agent.md` against
    `reference/clarity-agent.upstream.md` and fold routing changes into the
    skill by hand; then update the reference copy.
-5. Run `.venv/bin/pytest tests/ -q`, run the M1 staleness round-trip
-   (see README), update the pinned SHA in `upstream.json`, here, in
-   NOTICE.md, and in the vendored file headers (the pin-consistency tests
-   fail until all agree).
+5. For R16-packaged units (the decide/risks/message skills, the thinkers,
+   the embed snippet), re-apply the new upstream text below the frontmatter,
+   vendor header, and preamble — the packaging stays, the vendored body
+   changes.
+6. Run `.venv/bin/pytest tests/ -q` and `python3 scripts/upstream_audit.py`
+   (extend its allowlist only for changes that trace to a rule), run the M1
+   staleness round-trip (see README), update the pinned SHA in
+   `upstream.json`, here, in NOTICE.md, and in the vendored file headers
+   (the pin-consistency tests fail until all agree).
