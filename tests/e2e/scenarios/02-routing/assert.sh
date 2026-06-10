@@ -9,10 +9,23 @@ PROJ="$1"; OUT="$2"; REPO="$3"
 source "$(dirname "${BASH_SOURCE[0]}")/../../lib.sh"
 
 text="$(result_text "$OUT")"
-allowed="$(packet_json "$PROJ" | python3 -c '
+allowed="$(
+{
+  packet_json "$PROJ"
+  echo "---SPLIT---"
+  python3 "$REPO/scripts/protocol_status.py" "$PROJ" --next --json 2>/dev/null || true
+} | python3 -c '
 import json, sys
-r = json.load(sys.stdin)
+raw = sys.stdin.read()
+report_raw, _, next_raw = raw.partition("---SPLIT---")
+r = json.loads(report_raw)
 names = {p["process"] for p in r["processAvailability"] if p["status"] == "recommended"}
+try:
+    action = json.loads(next_raw)
+    if action and action.get("process"):
+        names.add(action["process"])
+except Exception:
+    pass
 print("\n".join(sorted(names)))
 ')"
 [[ -n "$allowed" ]] || fail "oracle error: engine recommends nothing for this packet" || exit 1

@@ -18,3 +18,14 @@ cat > "$PROJ/.clarity-protocol/failures/failure-02-snapshot-poisoning.md" <<'EOF
 
 [Not yet developed — Run failure management]
 EOF
+
+# A coherent post-analysis packet: the index lists analyzed failures (in real
+# flows failure-NN files only exist once analysis has written the index).
+cat > "$PROJ/.clarity-protocol/failures/failures.md" <<'EOF'
+# Failure Modes
+
+| # | Failure | Severity | Management |
+| - | ------- | -------- | ---------- |
+| [01](failure-01-token-replay.md) | Token replay after logout | high | planned |
+| [02](failure-02-snapshot-poisoning.md) | Snapshot poisoning via shared store | high | not yet developed |
+EOF

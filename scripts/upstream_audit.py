@@ -34,7 +34,7 @@ RAW = f"https://raw.githubusercontent.com/{CFG['repo']}/{PIN}"
 
 # Byte-identical entries.
 VERBATIM = {
-    "catalogs/security-catalog.csv",
+    "skills/risks/security-catalog.csv",
     "skills/start/reference/clarity-agent.upstream.md",
 }
 # Reported informationally only (deviations documented in their docstrings).

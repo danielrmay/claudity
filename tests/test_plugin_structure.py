@@ -284,10 +284,10 @@ class TestRepoHygiene:
         assert not (REPO / "Clarity Protocol").exists()
 
     def test_example_packet_matches_manifest(self) -> None:
-        """The example packet is a curated frozen snapshot; a stray e2e
-        session once 'analyzed' it in place. Any change must be deliberate
-        (update this manifest when curating)."""
-        root = REPO / "examples" / "feature-flags-cli" / ".clarity-protocol"
+        """The e2e fixture packet is a frozen snapshot whose states the
+        scenarios depend on; a stray session once 'analyzed' it in place.
+        Any change must be deliberate (update this manifest when curating)."""
+        root = REPO / "tests" / "e2e" / "fixtures" / "feature-flags-cli" / ".clarity-protocol"
         actual = {str(f.relative_to(root)) for f in root.rglob("*") if f.is_file()}
         expected = {
             "config.json", "notes.md", "observations.md", "summary.md",
@@ -303,6 +303,37 @@ class TestRepoHygiene:
             f"unexpected: {sorted(actual - expected)}; missing: {sorted(expected - actual)}"
         )
 
+    def test_showcase_example_matches_manifest(self) -> None:
+        """examples/dev-db-snap is a frozen real-session packet; protect it
+        from stray e2e sessions the same way as the fixture."""
+        root = REPO / "examples" / "dev-db-snap" / ".clarity-protocol"
+        actual = {str(f.relative_to(root)) for f in root.rglob("*") if f.is_file()}
+        expected = {
+            "config.json",
+            "decisions/decisions.md",
+            "failures/failures.md",
+            "goal/open-questions.md",
+            "goal/problem.md",
+            "goal/requirements.md",
+            "goal/resolved-questions.md",
+            "goal/stakeholders.md",
+            "notes.md",
+            "observations.md",
+            "solution/architecture.md",
+            "solution/solution-summary.md",
+            "solution/solution.md",
+            "summary.md",
+        }
+        assert actual == expected, (
+            f"unexpected: {sorted(actual - expected)}; missing: {sorted(expected - actual)}"
+        )
+
+    def test_showcase_goal_docs_are_real(self) -> None:
+        root = REPO / "examples" / "dev-db-snap" / ".clarity-protocol"
+        for doc in ("goal/problem.md", "goal/stakeholders.md", "goal/requirements.md"):
+            text = (root / doc).read_text()
+            assert "[To be determined" not in text and len(text) > 300, f"{doc} looks skeletal"
+
 
 # -----------------------------------------------------------------------
 # Upstream pin consistency (upstream.json is the source of truth)
@@ -311,7 +342,7 @@ class TestRepoHygiene:
 class TestUpstreamPin:
     # Verbatim vendored files that cannot carry a header comment.
     HEADER_EXEMPT = {
-        "catalogs/security-catalog.csv",
+        "skills/risks/security-catalog.csv",
         "skills/start/reference/clarity-agent.upstream.md",
         "skills/embed/SKILL.md",  # snippet inlined as a fenced template; header inside the fence
         "NOTICE.md",  # quotes the upstream license; carries the full pin instead
@@ -355,7 +386,7 @@ class TestUpstreamPin:
             and str(p.relative_to(REPO)) not in watched | rewrites | self.HEADER_EXEMPT
             # examples/ holds rendered artifacts of watched files (e.g. the
             # embedded CLAUDE.md rendered from the snippet), not vendoring units
-            and not str(p.relative_to(REPO)).startswith(("PORTING", "UPSTREAM", "README", "TESTING", "CHANGELOG", "examples/"))
+            and not str(p.relative_to(REPO)).startswith(("PORTING", "UPSTREAM", "README", "TESTING", "CHANGELOG", "tests/e2e/fixtures/", "examples/"))
         ]
         assert not unwatched, f"files with vendor headers not in upstream.json watch set: {unwatched}"
 

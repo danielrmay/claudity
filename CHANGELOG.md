@@ -9,6 +9,14 @@ the upstream pin it tracks).
 
 ### Changed (architecture)
 
+- Repository structure: `e2e/` moved under `tests/e2e/` (one testing home,
+  tiers distinguish); the security catalog lives with the skill that uses it
+  (`skills/risks/security-catalog.csv`); the skeletal packet formerly under
+  `examples/` is now honestly `tests/e2e/fixtures/feature-flags-cli` (its
+  states are scenario oracles), and `examples/dev-db-snap` is a real
+  Sonnet-session packet frozen at end of problem clarification, manifest-
+  protected like the fixture
+
 - Commands eliminated: every user surface is now a skill, and the 1:1 guide
   surfaces embed their vendored guide as the skill body — `/claudity:decide`,
   `/claudity:risks`, `/claudity:message` inject their guide directly (no

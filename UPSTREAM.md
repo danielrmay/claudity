@@ -32,7 +32,7 @@ table below is commentary on the same mapping.
 | `src/clarity_agent/setup/snippet.md` | `skills/embed/SKILL.md` | adapted for CLAUDE.md / no MCP server; inlined as the embed skill's template section (R16) |
 | `src/clarity_agent/protocol/packet_status.py` | `scripts/protocol_status.py` | whole file; package imports inlined (see its docstring) |
 | `src/clarity_agent/protocol/initialize.py` | `scripts/protocol_init.py` | adapted (see its docstring); templates verbatim |
-| `catalogs/security-catalog.csv` | `catalogs/security-catalog.csv` | verbatim |
+| `skills/risks/security-catalog.csv` | `skills/risks/security-catalog.csv` | verbatim |
 | `tests/test_packet_status.py` | `tests/test_protocol_status.py` | adapted imports + Mailbox stub (see its docstring) |
 | `tests/conftest.py` | `tests/conftest.py` | fixtures only, keyring/Settings dropped |
 | `LICENSE` | `NOTICE.md` (quoted) | verbatim |

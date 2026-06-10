@@ -8,7 +8,7 @@ project, so the bar is low and the loop is fast.
 ```bash
 python3 -m venv .venv && .venv/bin/pip install pytest
 .venv/bin/pytest tests/ -q      # Tier 1: free, deterministic; runs in CI
-e2e/run.sh                      # Tier 2: headless smoke (~$0.25 on Haiku, optional)
+tests/e2e/run.sh                      # Tier 2: headless smoke (~$0.25 on Haiku, optional)
 ```
 
 See [TESTING.md](TESTING.md) for what each tier covers.
@@ -56,8 +56,8 @@ porting it here. For a Claudity-only thinker:
    `skills/risks/SKILL.md` (the failure-brainstorming guide) (name, lens, required
    prerequisites), and `EXPECTED_AGENTS` in `tests/test_plugin_structure.py`.
 5. **Verify:** `.venv/bin/pytest tests/ -q`, then optionally run the thinker
-   for real against `examples/feature-flags-cli` via the
-   `e2e/scenarios/04-thinker` pattern.
+   for real against `tests/e2e/fixtures/feature-flags-cli` via the
+   `tests/tests/e2e/scenarios/04-thinker` pattern.
 
 ## Pull requests
 

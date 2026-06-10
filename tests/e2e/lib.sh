@@ -2,7 +2,7 @@
 # Shared helpers for Claudity e2e scenarios. Sourced by run.sh.
 set -uo pipefail
 
-REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 MODEL="${CLAUDITY_TEST_MODEL:-haiku}"
 ART_DIR="${CLAUDITY_E2E_ART_DIR:-$(mktemp -d /tmp/claudity-e2e-art.XXXXXX)}"
 
@@ -12,7 +12,9 @@ new_project() {
   dir=$(mktemp -d /tmp/claudity-e2e-proj.XXXXXX)
   mkdir "$dir/.git"
   if [[ "${1:-empty}" == "with-fixture" ]]; then
-    cp -R "$REPO/examples/feature-flags-cli/.clarity-protocol" "$dir/.clarity-protocol"
+    cp -R "$REPO/tests/e2e/fixtures/feature-flags-cli/.clarity-protocol" "$dir/.clarity-protocol"
+    # Real embedded projects carry the snippet in CLAUDE.md; the fixture must too.
+    cp "$REPO/tests/e2e/fixtures/feature-flags-cli/CLAUDE.md" "$dir/CLAUDE.md"
   fi
   echo "$dir"
 }

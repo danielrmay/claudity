@@ -69,7 +69,7 @@ It is not affiliated with or endorsed by Microsoft or Anthropic. See
 The common path is problem clarification → solution → failure analysis →
 architecture; everything else (discovery, decisions, messaging) is invoked on
 demand. See the [example session](docs/example-session.md) for what the first
-conversation looks like, and [examples/feature-flags-cli](examples/feature-flags-cli)
+conversation looks like, and [tests/e2e/fixtures/feature-flags-cli](tests/e2e/fixtures/feature-flags-cli)
 for a complete protocol directory.
 
 ## Use
@@ -137,7 +137,7 @@ knows what downstream needs revisiting.
 ```bash
 python3 -m venv .venv && .venv/bin/pip install pytest
 .venv/bin/pytest tests/ -q      # free, deterministic
-e2e/run.sh                      # headless behavioral smoke (~$2.50, mixed model floors)
+tests/e2e/run.sh                      # headless behavioral smoke (~$2.50, mixed model floors)
 ```
 
 See [TESTING.md](TESTING.md) for the full test-tier breakdown and cost model,

@@ -10,7 +10,7 @@ small headless smoke suite with a hard cost budget, run locally on demand.
 | ---- | ---- | ---- | ---- |
 | 0 | `claude plugin validate .` + component inventory (`claude --plugin-dir . plugin details claudity`) | free | CI, every push |
 | 1 | `pytest tests/` — 71 vendored status-engine tests + structural tests (manifests, frontmatter, cross-reference integrity, porting lints, init↔staleness coupling) | free | CI, every push |
-| 2 | `e2e/run.sh` — 9 headless scenarios with deterministic artifact assertions | ~$2.50 (mixed Haiku/Sonnet floors) | locally, before a release or after touching SKILL.md / processes / commands / agents |
+| 2 | `tests/e2e/run.sh` — 9 headless scenarios with deterministic artifact assertions | ~$2.50 (mixed Haiku/Sonnet floors) | locally, before a release or after touching SKILL.md / processes / commands / agents |
 
 ## Tier 1
 
@@ -30,10 +30,10 @@ Tests that shell out to `claude` are skipped when the CLI isn't on PATH.
 ## Tier 2
 
 ```bash
-e2e/run.sh                  # all scenarios, sequential
-e2e/run.sh 01               # one scenario by prefix
-e2e/run.sh --parallel       # all scenarios concurrently
-e2e/run.sh --stress 07 6    # 6 parallel copies of one scenario; pass rate
+tests/e2e/run.sh                  # all scenarios, sequential
+tests/e2e/run.sh 01               # one scenario by prefix
+tests/e2e/run.sh --parallel       # all scenarios concurrently
+tests/e2e/run.sh --stress 07 6    # 6 parallel copies of one scenario; pass rate
 ```
 
 A scenario is a **scripted persona conversation** plus deterministic

@@ -58,7 +58,7 @@ To launch thinkers (Step 4):
    - the project directory (absolute path) and protocol directory name (`.clarity-protocol/` or `Clarity Protocol/`)
    - the analysis mode: **quick** or **deep**
    - the absolute path to `<plugin-root>/skills/start/processes/failure-reasoning-guidelines.md`
-   - for `security-catalog-thinker` only: the absolute path to `<plugin-root>/catalogs/security-catalog.csv`
+   - for `security-catalog-thinker` only: the absolute path to `<plugin-root>/skills/risks/security-catalog.csv`
 3. Each thinker returns structured `## Failures` / `## Suggestions` / `## Specialist recommendations` blocks. Persist its failures by saving the thinker's full returned text to a temp file and running the pool script, which writes one correctly-placed pool file per failure and prints each path:
 
    ```bash

@@ -89,8 +89,8 @@
       "local": "scripts/protocol_init.py"
     },
     {
-      "upstream": "catalogs/security-catalog.csv",
-      "local": "catalogs/security-catalog.csv"
+      "upstream": "skills/risks/security-catalog.csv",
+      "local": "skills/risks/security-catalog.csv"
     },
     {
       "upstream": "tests/test_packet_status.py",

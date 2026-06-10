@@ -3,10 +3,10 @@
 # artifact assertions and a hard cost budget.
 #
 # Usage:
-#   e2e/run.sh                    # all scenarios, sequential
-#   e2e/run.sh 01                 # scenarios matching a prefix
-#   e2e/run.sh --parallel         # all scenarios concurrently (independent scratch projects)
-#   e2e/run.sh --stress 07 6      # 6 parallel copies of one scenario; reports pass rate
+#   tests/e2e/run.sh                    # all scenarios, sequential
+#   tests/e2e/run.sh 01                 # scenarios matching a prefix
+#   tests/e2e/run.sh --parallel         # all scenarios concurrently (independent scratch projects)
+#   tests/e2e/run.sh --stress 07 6      # 6 parallel copies of one scenario; reports pass rate
 #
 # Env:
 #   CLAUDITY_TEST_MODEL    model for runs (default: haiku)

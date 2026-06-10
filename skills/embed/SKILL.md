@@ -39,7 +39,7 @@ This project uses the Clarity Protocol for structured thinking about consequenti
 
 **Before building — think when it matters.** Two triggers:
 
-1. *The user asks.* When they want to explore what to build, clarify requirements, brainstorm risks, or work through a decision: use Claudity's `start` skill (`/claudity:start`).
+1. *The user asks.* When they want to explore what to build, clarify requirements, brainstorm risks, work through a decision, or create or update any protocol document (failure plans, solutions, narratives): use Claudity's `start` skill (`/claudity:start`). Never work on protocol documents freehand — the skills carry required pipeline steps (status checks, pool handling, state recording) that freehand edits silently miss.
 
 2. *You recognize an inflection point.* Before making choices that would be expensive to reverse — new services, auth/trust models, data schemas, external integrations, significant API contracts — check what you plan to do against the protocol: read `{{PROTOCOL_DIR_NAME}}/decisions/decisions.md`, `goal/requirements.md`, and `solution/architecture.md` for conflicts. Don't interrupt for routine implementation. The test: "If this turns out wrong, is it a 5-minute fix or a multi-day rework?" Interrupt for the latter.
 
