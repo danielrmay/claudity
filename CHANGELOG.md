@@ -7,7 +7,7 @@ the upstream pin it tracks).
 
 ## [Unreleased]
 
-## [0.3.0] - 2026-06-10
+## [0.3.0] - 2026-06-11
 
 Tracks microsoft/clarity-agent@6b32c43 (upstream v0.1.2).
 
@@ -80,6 +80,14 @@ Tracks microsoft/clarity-agent@6b32c43 (upstream v0.1.2).
 
 ### Changed
 
+- README repositioned around asking the questions an architect would ask
+  and recording decisions in the repo (previously "pushes back"), with a
+  simulated Claude Code terminal session as the hero GIF (`assets/hero.gif`)
+  and a compacted install section; `plugin.json`/`marketplace.json`
+  descriptions match the new framing (#9, #10)
+- NOTICE.md points at `upstream.json` for the upstream pin instead of
+  hardcoding the commit hash; the full pin now lives in `upstream.json` and
+  UPSTREAM.md only (#11)
 - **Guide text reverts toward upstream verbatim** now that the MCP tools
   are real (the determinism-driven substitutions R2–R7/R13/R14 are retired;
   reversal rationale recorded in PORTING.md): the embed snippet's
